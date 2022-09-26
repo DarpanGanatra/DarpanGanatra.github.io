@@ -1,12 +1,5 @@
 [
   {
-    "objectID": "posts/post-with-code/index.html",
-    "href": "posts/post-with-code/index.html",
-    "title": "Post With Code",
-    "section": "",
-    "text": "This is a post with executable code."
-  },
-  {
     "objectID": "posts/Implementing-Statistics/Implementing-Statistics.html",
     "href": "posts/Implementing-Statistics/Implementing-Statistics.html",
     "title": "Logistic Regression",
@@ -26,13 +19,6 @@
     "title": "Logistic Regression",
     "section": "Model Building",
     "text": "Model Building\nNow on to the part that most of you are here for: building a logistic model using sklearn\n\n\nCode\nfrom sklearn.linear_model import LogisticRegression\nimport pandas as pd\n\n\nOne last time, let’s take a look at our data, but in a different way this time. Lets look at it in 3D, so we can see the literal sigmoidal nature of our model:\n\n\nCode\nfig = plt.figure(figsize=(14, 7))\nax = plt.axes(projection=\"3d\")\nax.plot_surface(\n    x_sample, y_sample, target_sample, cmap=\"coolwarm\", rcount=200, ccount=200\n)\nax.set_xlabel(r\"$x_1$\")\nax.set_ylabel(r\"$x_2$\")\nax.zaxis.set_rotate_label(False)\nax.set_zlabel(r\"$f(x_{0},x_{1})$\", rotation=0)\nax.view_init(15, 70)\nplt.title(\"Training Data\")\nplt.show()\n\n\n\n\n\nNote the little section in the middle where we’ve added uncertainty. Everything else is relatively concrete in the output (we’re keeping it simple).\nNext step that we want to put our data in a nice dataframe and use LogisticRegression from sklearn.linear_model. This has some default that we’re going to use. Specifically, the “penalty” assigned to our training is the L2 norm. I’m going to make a post about the different types of penalty, but let’s keep it moving for now.\n\ndf = pd.DataFrame(\n    {\"x1\": x_sample.ravel(), \"x2\": y_sample.ravel(), \"target\": target_sample.ravel()}\n)\n\ndf.head()\n\n\n\n\n\n  \n    \n      \n      x1\n      x2\n      target\n    \n  \n  \n    \n      0\n      1.00\n      1.0\n      0\n    \n    \n      1\n      1.07\n      1.0\n      10\n    \n    \n      2\n      1.14\n      1.0\n      10\n    \n    \n      3\n      1.21\n      1.0\n      0\n    \n    \n      4\n      1.28\n      1.0\n      0\n    \n  \n\n\n\n\nThere’s our little table, and here’s how we can fit the logistic regression with the defaults:\n\nmodel = LogisticRegression(random_state=0)\nmodel.fit(df[[\"x1\", \"x2\"]], df.target)\n\nLogisticRegression(random_state=0)\n\n\nNow that we’ve fitted our data, we can do a few things. Yes, we can predict, but also importantly we can learn about the model itself. Remember the basic structure of the model? Well now we can determine what our model should have looked like. There are a few ways we can go about this, namely we can use the model.coef_ and model.intercept to manually calculate the output values, or we can just use model.predict. Now keep in mind I’m running the prediction on the training data, mainly so I can see if the structure was captured:\n\n\nCode\ndf[\"predictions\"] = model.predict(df[[\"x1\", \"x2\"]])\nfig = plt.figure(figsize=(14, 7))\nax = plt.axes(projection=\"3d\")\nax.plot_surface(\n    x_sample, y_sample, df[[\"predictions\"]].to_numpy().reshape(72, 72), cmap=\"coolwarm\"\n)\nax.set_xlabel(\"x1\")\nax.set_ylabel(\"x2\")\nax.set_zlabel(\"pred\")\nax.view_init(15, 70)\nplt.show()\n\n\n\n\n\nThat looks extremely similiar to the idea we had when we created the data. So on that note, I’m going to leave the basics of logistic regression here. Next up we can take a closer look at prediction and accuracy of the model."
-  },
-  {
-    "objectID": "posts/welcome/index.html",
-    "href": "posts/welcome/index.html",
-    "title": "Welcome To My Blog",
-    "section": "",
-    "text": "Since this post doesn’t specify an explicit image, the first image in the post will be used in the listing page of posts."
   },
   {
     "objectID": "posts/2022-06-13-Linear-Regression-TF.html",
@@ -102,7 +88,7 @@
     "href": "index.html",
     "title": "Learning how to learn",
     "section": "",
-    "text": "news\n\n\ncode\n\n\nanalysis\n\n\n\n\n\n\n\n\n\n\n\nSep 25, 2022\n\n\nHarlow Malloc\n\n\n\n\n\n\n  \n\n\n\n\n\n\n\n\n\n\nnews\n\n\n\n\n\n\n\n\n\n\n\nSep 22, 2022\n\n\nTristan O’Malley\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nBecause honestly why not?\n\n\n\n\njupyter\n\n\npython\n\n\ntensorflow\n\n\nlinear-regression\n\n\n\n\n\n\n\n\n\n\n\nJun 13, 2022\n\n\nDarpan Ganatra\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nIt’s been a while since I’ve brushed up on my time series forecasting techniques. Time to get on it (this is a work in progress).\n\n\n\n\njupyter\n\n\npython\n\n\ntimeseries\n\n\n\n\n\n\n\n\n\n\n\nJun 3, 2022\n\n\nDarpan Ganatra\n\n\n\n\n\n\n  \n\n\n\n\n\nWhat the heck is logistic regression and how do you implement it?\n\n\n\n\njupyter\n\n\npython\n\n\nsklearn\n\n\nlogistic_regression\n\n\n\n\n\n\n\n\n\n\n\nJun 2, 2022\n\n\nDarpan Ganatra\n\n\n\n\n\n\n  \n\n\n\n\n\nThe first in a series of tutorials to model ODEs and systems of ODEs in Python.\n\n\n\n\njupyter\n\n\npython\n\n\nmodelling\n\n\ncomp_bio\n\n\n\n\n\n\n\n\n\n\n\nMay 19, 2022\n\n\nDarpan Ganatra\n\n\n\n\n\n\nNo matching items"
+    "text": "Because honestly why not?\n\n\n\n\njupyter\n\n\npython\n\n\ntensorflow\n\n\nlinear-regression\n\n\n\n\n\n\n\n\n\n\n\nJun 13, 2022\n\n\nDarpan Ganatra\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nIt’s been a while since I’ve brushed up on my time series forecasting techniques. Time to get on it (this is a work in progress).\n\n\n\n\njupyter\n\n\npython\n\n\ntimeseries\n\n\n\n\n\n\n\n\n\n\n\nJun 3, 2022\n\n\nDarpan Ganatra\n\n\n\n\n\n\n  \n\n\n\n\n\nWhat the heck is logistic regression and how do you implement it?\n\n\n\n\njupyter\n\n\npython\n\n\nsklearn\n\n\nlogistic_regression\n\n\n\n\n\n\n\n\n\n\n\nJun 2, 2022\n\n\nDarpan Ganatra\n\n\n\n\n\n\n  \n\n\n\n\n\nThe first in a series of tutorials to model ODEs and systems of ODEs in Python.\n\n\n\n\njupyter\n\n\npython\n\n\nmodelling\n\n\ncomp_bio\n\n\n\n\n\n\n\n\n\n\n\nMay 19, 2022\n\n\nDarpan Ganatra\n\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "about.html",
