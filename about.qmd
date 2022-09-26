@@ -1,0 +1,25 @@
+---
+title: "Darpan Ganatra"
+image: profile.jpg
+about:
+  template: solana
+  links:
+    - icon: twitter
+      text: Twitter
+      href: https://twitter.com/DarpanGanatra
+    - icon: linkedin
+      text: LinkedIn
+      href: https://linkedin.com/in/DarpanGanatra
+    - icon: github
+      text: Github
+      href: https://github.com/DarpanGanatra
+
+---
+My name is Darpan Ganatra. I like learning anything and everything, often times all at once. I'm currently a machine learning engineer at Amyris focused on cool bio projects.
+
+## Education
+**New Jersey Institute of Technology** | Newark, NJ\
+MSc in Data Science, Statistics Track
+
+**Rutgers University, New Brunswick** | New Brunswick, NJ\
+B.A. in Mathematics
