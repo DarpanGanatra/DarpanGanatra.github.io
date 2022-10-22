@@ -8,6 +8,7 @@
 
 <meta name="author" content="Darpan Ganatra">
 <meta name="dcterms.date" content="2022-05-19">
+<meta name="description" content="The first in a series of tutorials to model ODEs and systems of ODEs in Python.">
 
 <title>Math and rambling - Modelling Differential Equations in Python</title>
 <style>
@@ -129,7 +130,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <link rel="stylesheet" href="../../styles.css">
 </head>
 
-<body class="nav-fixed fullcontent">
+<body class="nav-fixed">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -169,8 +170,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
       <div class="quarto-title-block"><div><h1 class="title">Modelling Differential Equations in Python</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li></ul></div></div>
-            <p class="subtitle lead">The first in a series of tutorials to model ODEs and systems of ODEs in Python.</p>
-                                <div class="quarto-categories">
+                  <div>
+        <div class="description">
+          The first in a series of tutorials to model ODEs and systems of ODEs in Python.
+        </div>
+      </div>
+                          <div class="quarto-categories">
                 <div class="quarto-category">jupyter</div>
                 <div class="quarto-category">python</div>
                 <div class="quarto-category">modelling</div>
@@ -202,7 +207,16 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#single-differential-equation-decay" id="toc-single-differential-equation-decay" class="nav-link" data-scroll-target="#single-differential-equation-decay">Single Differential Equation (Decay)</a></li>
+  </ul>
+</nav>
+    </div>
 <!-- main -->
 <main class="content quarto-banner-title-block" id="quarto-document-content">
 
@@ -239,11 +253,11 @@ y(0) &amp;= 1 = Ke^{-0} \\
 <div class="cell" data-execution_count="61">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.integrate <span class="im">import</span> solve_ivp</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>plt.style.use(<span class="st">'seaborn'</span>)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>plt.rcParams.update({<span class="st">'font.size'</span>: <span class="dv">12</span>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1"></a><span class="im">from</span> scipy.integrate <span class="im">import</span> solve_ivp</span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-4"><a href="#cb1-4"></a>plt.style.use(<span class="st">'seaborn'</span>)</span>
+<span id="cb1-5"><a href="#cb1-5"></a>plt.rcParams.update({<span class="st">'font.size'</span>: <span class="dv">12</span>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>First thing we need to work through is how to define the model. We’ll be using <code>solve_ivp</code> rather than <code>odeint</code> from the <code>scipy.integrate</code> library. Why? Because <code>odeint</code> is now outdated. I’ll provide a refrence to this later.</p>
@@ -256,12 +270,12 @@ y(0) &amp;= 1 = Ke^{-0} \\
 <p>At this second, we’re going to ignore that last thing, because it’s not necessary for us (yet).</p>
 <p>Here’s how we can model decay:</p>
 <div class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> decay_model(t,y):</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Simple decay model</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">    dy/dt = -y</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="op">-</span>y</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1"></a><span class="kw">def</span> decay_model(t,y):</span>
+<span id="cb2-2"><a href="#cb2-2"></a>    <span class="co">"""</span></span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="co">    Simple decay model</span></span>
+<span id="cb2-4"><a href="#cb2-4"></a><span class="co">    dy/dt = -y</span></span>
+<span id="cb2-5"><a href="#cb2-5"></a><span class="co">    """</span></span>
+<span id="cb2-6"><a href="#cb2-6"></a>    <span class="cf">return</span> <span class="op">-</span>y</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Now that we have our model created, we can feed it into <code>solve_ivp</code>. To do this, we need to determine a few things. Specifically:</p>
 <ol type="1">
@@ -274,23 +288,23 @@ y(0) &amp;= 1 = Ke^{-0} \\
 <div class="cell" data-execution_count="68">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>solution_array <span class="op">=</span> <span class="bu">list</span>()</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize <span class="op">=</span> (<span class="dv">14</span>,<span class="dv">7</span>))</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>, <span class="dv">5</span>):     </span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    solution <span class="op">=</span> solve_ivp(fun <span class="op">=</span> decay_model,</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>                         t_span <span class="op">=</span> [<span class="dv">0</span>, <span class="dv">6</span>],</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>                         y0 <span class="op">=</span> [i], </span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>                         dense_output<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    ax.plot(solution.t, solution.y[<span class="dv">0</span>], label <span class="op">=</span> <span class="vs">fr"$K = </span><span class="sc">{</span>i<span class="sc">}</span><span class="vs">$"</span>)</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"Exponential Decay Solution"</span>)</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="vs">r'$Ke^{-t}$'</span>)</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="vs">r'$t$'</span>)</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>ax.set_xlim(left <span class="op">=</span> <span class="dv">0</span>, right <span class="op">=</span> <span class="bu">max</span>(solution.t))</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>ax.set_ylim(bottom <span class="op">=</span> <span class="dv">0</span>)</span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1"></a>solution_array <span class="op">=</span> <span class="bu">list</span>()</span>
+<span id="cb3-2"><a href="#cb3-2"></a></span>
+<span id="cb3-3"><a href="#cb3-3"></a>fig, ax <span class="op">=</span> plt.subplots(figsize <span class="op">=</span> (<span class="dv">14</span>,<span class="dv">7</span>))</span>
+<span id="cb3-4"><a href="#cb3-4"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>, <span class="dv">5</span>):     </span>
+<span id="cb3-5"><a href="#cb3-5"></a>    solution <span class="op">=</span> solve_ivp(fun <span class="op">=</span> decay_model,</span>
+<span id="cb3-6"><a href="#cb3-6"></a>                         t_span <span class="op">=</span> [<span class="dv">0</span>, <span class="dv">6</span>],</span>
+<span id="cb3-7"><a href="#cb3-7"></a>                         y0 <span class="op">=</span> [i], </span>
+<span id="cb3-8"><a href="#cb3-8"></a>                         dense_output<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb3-9"><a href="#cb3-9"></a></span>
+<span id="cb3-10"><a href="#cb3-10"></a>    ax.plot(solution.t, solution.y[<span class="dv">0</span>], label <span class="op">=</span> <span class="vs">fr"$K = </span><span class="sc">{</span>i<span class="sc">}</span><span class="vs">$"</span>)</span>
+<span id="cb3-11"><a href="#cb3-11"></a>ax.set_title(<span class="st">"Exponential Decay Solution"</span>)</span>
+<span id="cb3-12"><a href="#cb3-12"></a>ax.set_ylabel(<span class="vs">r'$Ke^{-t}$'</span>)</span>
+<span id="cb3-13"><a href="#cb3-13"></a>ax.set_xlabel(<span class="vs">r'$t$'</span>)</span>
+<span id="cb3-14"><a href="#cb3-14"></a>ax.set_xlim(left <span class="op">=</span> <span class="dv">0</span>, right <span class="op">=</span> <span class="bu">max</span>(solution.t))</span>
+<span id="cb3-15"><a href="#cb3-15"></a>ax.set_ylim(bottom <span class="op">=</span> <span class="dv">0</span>)</span>
+<span id="cb3-16"><a href="#cb3-16"></a>ax.legend()</span>
+<span id="cb3-17"><a href="#cb3-17"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <div id="exponential-decay-graph" class="quarto-figure quarto-figure-center anchored">

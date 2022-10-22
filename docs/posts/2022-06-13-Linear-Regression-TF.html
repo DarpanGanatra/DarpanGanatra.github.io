@@ -8,6 +8,7 @@
 
 <meta name="author" content="Darpan Ganatra">
 <meta name="dcterms.date" content="2022-06-13">
+<meta name="description" content="Because honestly why not?">
 
 <title>Math and rambling - Linear Regression with minibatch gradient descent in TensorFlow</title>
 <style>
@@ -129,7 +130,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <link rel="stylesheet" href="../styles.css">
 </head>
 
-<body class="nav-fixed fullcontent">
+<body class="nav-fixed">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -169,8 +170,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
       <h1 class="title">Linear Regression with minibatch gradient descent in TensorFlow</h1>
-            <p class="subtitle lead">Because honestly why not?</p>
-                                <div class="quarto-categories">
+                  <div>
+        <div class="description">
+          Because honestly why not?
+        </div>
+      </div>
+                          <div class="quarto-categories">
                 <div class="quarto-category">jupyter</div>
                 <div class="quarto-category">python</div>
                 <div class="quarto-category">tensorflow</div>
@@ -202,7 +207,21 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#data-generation" id="toc-data-generation" class="nav-link active" data-scroll-target="#data-generation">Data Generation</a></li>
+  <li><a href="#data-visualization" id="toc-data-visualization" class="nav-link" data-scroll-target="#data-visualization">Data Visualization</a></li>
+  <li><a href="#training-minibatch-stochiastic-gradient-descent" id="toc-training-minibatch-stochiastic-gradient-descent" class="nav-link" data-scroll-target="#training-minibatch-stochiastic-gradient-descent">Training &amp; (minibatch stochiastic) Gradient Descent</a>
+  <ul class="collapse">
+  <li><a href="#gradient-descent" id="toc-gradient-descent" class="nav-link" data-scroll-target="#gradient-descent">Gradient Descent</a></li>
+  <li><a href="#batches-n-stuff" id="toc-batches-n-stuff" class="nav-link" data-scroll-target="#batches-n-stuff">Batches ’n Stuff</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
 <!-- main -->
 <main class="content quarto-banner-title-block" id="quarto-document-content">
 
@@ -213,10 +232,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="cell" data-execution_count="1">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> random</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tensorflow <span class="im">as</span> tf</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1"></a><span class="im">import</span> random</span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="im">import</span> tensorflow <span class="im">as</span> tf</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <section id="data-generation" class="level2">
@@ -285,25 +304,25 @@ b_n
 \end{bmatrix}
 \]</span></p>
 <div class="cell" data-execution_count="10">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> generate_data(w, b, num_samples):</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Create sample data of the form</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">    </span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">    y = Xw + b + epsilon </span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">    </span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">    Where epsilon is random noise centered around 0, std dev 0.01</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    X <span class="op">=</span> tf.random.normal(shape<span class="op">=</span>(num_samples, w.shape[<span class="dv">0</span>]))</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    w_reshaped <span class="op">=</span> tf.reshape(w, shape<span class="op">=</span>(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>))</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    epsilon <span class="op">=</span> tf.random.normal(shape<span class="op">=</span>(num_samples, <span class="dv">1</span>), stddev<span class="op">=</span><span class="fl">0.01</span>)</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    y <span class="op">=</span> tf.matmul(X, w_reshaped) <span class="op">+</span> b <span class="op">+</span> epsilon</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> X, y</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>true_w <span class="op">=</span> tf.constant([<span class="dv">2</span>, <span class="op">-</span><span class="fl">3.4</span>])</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>true_b <span class="op">=</span> <span class="fl">4.2</span></span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>features, labels <span class="op">=</span> generate_data(true_w, true_b, <span class="dv">1000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1"></a><span class="kw">def</span> generate_data(w, b, num_samples):</span>
+<span id="cb2-2"><a href="#cb2-2"></a>    <span class="co">"""</span></span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="co">    Create sample data of the form</span></span>
+<span id="cb2-4"><a href="#cb2-4"></a><span class="co">    </span></span>
+<span id="cb2-5"><a href="#cb2-5"></a><span class="co">    y = Xw + b + epsilon </span></span>
+<span id="cb2-6"><a href="#cb2-6"></a><span class="co">    </span></span>
+<span id="cb2-7"><a href="#cb2-7"></a><span class="co">    Where epsilon is random noise centered around 0, std dev 0.01</span></span>
+<span id="cb2-8"><a href="#cb2-8"></a><span class="co">    """</span></span>
+<span id="cb2-9"><a href="#cb2-9"></a>    X <span class="op">=</span> tf.random.normal(shape<span class="op">=</span>(num_samples, w.shape[<span class="dv">0</span>]))</span>
+<span id="cb2-10"><a href="#cb2-10"></a>    w_reshaped <span class="op">=</span> tf.reshape(w, shape<span class="op">=</span>(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>))</span>
+<span id="cb2-11"><a href="#cb2-11"></a>    epsilon <span class="op">=</span> tf.random.normal(shape<span class="op">=</span>(num_samples, <span class="dv">1</span>), stddev<span class="op">=</span><span class="fl">0.01</span>)</span>
+<span id="cb2-12"><a href="#cb2-12"></a>    y <span class="op">=</span> tf.matmul(X, w_reshaped) <span class="op">+</span> b <span class="op">+</span> epsilon</span>
+<span id="cb2-13"><a href="#cb2-13"></a>    <span class="cf">return</span> X, y</span>
+<span id="cb2-14"><a href="#cb2-14"></a></span>
+<span id="cb2-15"><a href="#cb2-15"></a></span>
+<span id="cb2-16"><a href="#cb2-16"></a>true_w <span class="op">=</span> tf.constant([<span class="dv">2</span>, <span class="op">-</span><span class="fl">3.4</span>])</span>
+<span id="cb2-17"><a href="#cb2-17"></a>true_b <span class="op">=</span> <span class="fl">4.2</span></span>
+<span id="cb2-18"><a href="#cb2-18"></a></span>
+<span id="cb2-19"><a href="#cb2-19"></a>features, labels <span class="op">=</span> generate_data(true_w, true_b, <span class="dv">1000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="data-visualization" class="level2">
@@ -312,14 +331,14 @@ b_n
 <div class="cell" data-execution_count="29">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">14</span>, <span class="dv">7</span>))</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="vs">r"$Xw + b + \epsilon$"</span>)</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>plt.scatter(features[:, <span class="dv">0</span>], labels, label<span class="op">=</span><span class="st">"Feature 1"</span>)</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>plt.scatter(features[:, <span class="dv">1</span>], labels, label<span class="op">=</span><span class="st">"Feature 2"</span>)</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Feature Matrix"</span>)</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Label"</span>)</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">14</span>, <span class="dv">7</span>))</span>
+<span id="cb3-2"><a href="#cb3-2"></a>plt.title(<span class="vs">r"$Xw + b + \epsilon$"</span>)</span>
+<span id="cb3-3"><a href="#cb3-3"></a>plt.scatter(features[:, <span class="dv">0</span>], labels, label<span class="op">=</span><span class="st">"Feature 1"</span>)</span>
+<span id="cb3-4"><a href="#cb3-4"></a>plt.scatter(features[:, <span class="dv">1</span>], labels, label<span class="op">=</span><span class="st">"Feature 2"</span>)</span>
+<span id="cb3-5"><a href="#cb3-5"></a>plt.xlabel(<span class="st">"Feature Matrix"</span>)</span>
+<span id="cb3-6"><a href="#cb3-6"></a>plt.ylabel(<span class="st">"Label"</span>)</span>
+<span id="cb3-7"><a href="#cb3-7"></a>plt.legend()</span>
+<span id="cb3-8"><a href="#cb3-8"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <p><img src="2022-06-13-Linear-Regression-TF_files/figure-html/cell-4-output-1.png" class="img-fluid"></p>
@@ -328,18 +347,18 @@ b_n
 <div class="cell" data-execution_count="31">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> plt.figure(figsize <span class="op">=</span> (<span class="dv">14</span>,<span class="dv">14</span>))</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> plt.axes(projection<span class="op">=</span><span class="st">'3d'</span>)</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>ax.scatter3D(features[:, <span class="dv">0</span>], </span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>             features[:, <span class="dv">1</span>], </span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>             labels, cmap <span class="op">=</span> <span class="st">'coolwarm'</span>)</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="vs">r"$x_1$"</span>)</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="vs">r"$x_2$"</span>)</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>ax.zaxis.set_rotate_label(<span class="va">False</span>)</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>ax.set_zlabel(<span class="vs">r"$y$"</span>, rotation <span class="op">=</span> <span class="dv">0</span>)</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>ax.view_init(<span class="dv">20</span>, <span class="dv">140</span>)</span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Training Data"</span>)</span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1"></a>fig <span class="op">=</span> plt.figure(figsize <span class="op">=</span> (<span class="dv">14</span>,<span class="dv">14</span>))</span>
+<span id="cb4-2"><a href="#cb4-2"></a>ax <span class="op">=</span> plt.axes(projection<span class="op">=</span><span class="st">'3d'</span>)</span>
+<span id="cb4-3"><a href="#cb4-3"></a>ax.scatter3D(features[:, <span class="dv">0</span>], </span>
+<span id="cb4-4"><a href="#cb4-4"></a>             features[:, <span class="dv">1</span>], </span>
+<span id="cb4-5"><a href="#cb4-5"></a>             labels, cmap <span class="op">=</span> <span class="st">'coolwarm'</span>)</span>
+<span id="cb4-6"><a href="#cb4-6"></a>ax.set_xlabel(<span class="vs">r"$x_1$"</span>)</span>
+<span id="cb4-7"><a href="#cb4-7"></a>ax.set_ylabel(<span class="vs">r"$x_2$"</span>)</span>
+<span id="cb4-8"><a href="#cb4-8"></a>ax.zaxis.set_rotate_label(<span class="va">False</span>)</span>
+<span id="cb4-9"><a href="#cb4-9"></a>ax.set_zlabel(<span class="vs">r"$y$"</span>, rotation <span class="op">=</span> <span class="dv">0</span>)</span>
+<span id="cb4-10"><a href="#cb4-10"></a>ax.view_init(<span class="dv">20</span>, <span class="dv">140</span>)</span>
+<span id="cb4-11"><a href="#cb4-11"></a>plt.title(<span class="st">"Training Data"</span>)</span>
+<span id="cb4-12"><a href="#cb4-12"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <p><img src="2022-06-13-Linear-Regression-TF_files/figure-html/cell-5-output-1.png" class="img-fluid"></p>
@@ -364,18 +383,18 @@ b_n
 \]</span></p>
 <p>Why does that matter? Because gradient descent is an algorithm which looks at the fact that when you take the derivative of a given function (lets call that <span class="math inline">\(f'(x)\)</span>) and plug in values, you can see how <strong>steep</strong> the original function is. Let me show you what I mean:</p>
 <div class="cell" data-execution_count="63">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">10</span>, <span class="dv">10</span>)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>f <span class="op">=</span> x<span class="op">**</span><span class="dv">2</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize <span class="op">=</span> (<span class="dv">14</span>,<span class="dv">7</span>))</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Derivative"</span>)</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>plt.xlim(left <span class="op">=</span> <span class="bu">min</span>(x), right <span class="op">=</span> <span class="bu">max</span>(x))</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>plt.ylim(<span class="op">-</span><span class="dv">40</span>, <span class="dv">100</span>)</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>plt.plot(x, f, label <span class="op">=</span> <span class="st">'Original Function'</span>)</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>plt.plot(x, [<span class="dv">4</span><span class="op">*</span>i <span class="op">-</span> <span class="dv">4</span> <span class="cf">for</span> i <span class="kw">in</span> x], label <span class="op">=</span> <span class="st">'Rate of change at x = 2'</span>)</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>plt.vlines(x <span class="op">=</span> <span class="dv">2</span>, ymin <span class="op">=</span> <span class="op">-</span><span class="dv">40</span>, ymax <span class="op">=</span> <span class="dv">100</span>, linestyles<span class="op">=</span><span class="st">'--'</span>, color<span class="op">=</span><span class="st">'red'</span>)</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1"></a>x <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">10</span>, <span class="dv">10</span>)</span>
+<span id="cb5-2"><a href="#cb5-2"></a>f <span class="op">=</span> x<span class="op">**</span><span class="dv">2</span></span>
+<span id="cb5-3"><a href="#cb5-3"></a></span>
+<span id="cb5-4"><a href="#cb5-4"></a>plt.figure(figsize <span class="op">=</span> (<span class="dv">14</span>,<span class="dv">7</span>))</span>
+<span id="cb5-5"><a href="#cb5-5"></a>plt.title(<span class="st">"Derivative"</span>)</span>
+<span id="cb5-6"><a href="#cb5-6"></a>plt.xlim(left <span class="op">=</span> <span class="bu">min</span>(x), right <span class="op">=</span> <span class="bu">max</span>(x))</span>
+<span id="cb5-7"><a href="#cb5-7"></a>plt.ylim(<span class="op">-</span><span class="dv">40</span>, <span class="dv">100</span>)</span>
+<span id="cb5-8"><a href="#cb5-8"></a>plt.plot(x, f, label <span class="op">=</span> <span class="st">'Original Function'</span>)</span>
+<span id="cb5-9"><a href="#cb5-9"></a>plt.plot(x, [<span class="dv">4</span><span class="op">*</span>i <span class="op">-</span> <span class="dv">4</span> <span class="cf">for</span> i <span class="kw">in</span> x], label <span class="op">=</span> <span class="st">'Rate of change at x = 2'</span>)</span>
+<span id="cb5-10"><a href="#cb5-10"></a>plt.vlines(x <span class="op">=</span> <span class="dv">2</span>, ymin <span class="op">=</span> <span class="op">-</span><span class="dv">40</span>, ymax <span class="op">=</span> <span class="dv">100</span>, linestyles<span class="op">=</span><span class="st">'--'</span>, color<span class="op">=</span><span class="st">'red'</span>)</span>
+<span id="cb5-11"><a href="#cb5-11"></a>plt.legend()</span>
+<span id="cb5-12"><a href="#cb5-12"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <p><img src="2022-06-13-Linear-Regression-TF_files/figure-html/cell-6-output-1.png" class="img-fluid"></p>
 </div>
@@ -412,16 +431,16 @@ a_{n+1} = a_{n} - \gamma \nabla F(a_n)
 \dfrac{\text{Dataset Size}}{\text{Batch Size}} = \dfrac{1000}{10} = 100 \text{ times}
 \]</span></p>
 <div class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> data_iter(batch_size, features, labels):</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Creating minibatches to use in training</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    num_examples <span class="op">=</span> <span class="bu">len</span>(features)</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    indicies <span class="op">=</span> <span class="bu">list</span>(<span class="bu">range</span>(num_examples))</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    random.shuffle(indicies)</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>, num_examples, batch_size):</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>        j <span class="op">=</span> tf.constant(indicies[i : <span class="bu">min</span>(i <span class="op">+</span> batch_size, num_examples)])</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">yield</span> tf.gather(features, j), tf.gather(labels, j)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1"></a><span class="kw">def</span> data_iter(batch_size, features, labels):</span>
+<span id="cb6-2"><a href="#cb6-2"></a>    <span class="co">"""</span></span>
+<span id="cb6-3"><a href="#cb6-3"></a><span class="co">    Creating minibatches to use in training</span></span>
+<span id="cb6-4"><a href="#cb6-4"></a><span class="co">    """</span></span>
+<span id="cb6-5"><a href="#cb6-5"></a>    num_examples <span class="op">=</span> <span class="bu">len</span>(features)</span>
+<span id="cb6-6"><a href="#cb6-6"></a>    indicies <span class="op">=</span> <span class="bu">list</span>(<span class="bu">range</span>(num_examples))</span>
+<span id="cb6-7"><a href="#cb6-7"></a>    random.shuffle(indicies)</span>
+<span id="cb6-8"><a href="#cb6-8"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>, num_examples, batch_size):</span>
+<span id="cb6-9"><a href="#cb6-9"></a>        j <span class="op">=</span> tf.constant(indicies[i : <span class="bu">min</span>(i <span class="op">+</span> batch_size, num_examples)])</span>
+<span id="cb6-10"><a href="#cb6-10"></a>        <span class="cf">yield</span> tf.gather(features, j), tf.gather(labels, j)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The rest of the code here should be relatively clear, but if it isnt here’s a brief summary:</p>
 <ul>
@@ -430,34 +449,34 @@ a_{n+1} = a_{n} - \gamma \nabla F(a_n)
 </ul>
 <p>The final training loop simply takes the values of the number of epochs (i.e.&nbsp;the number of times we want to complete a training iteration) and applies the tensorflow implementation of gradient to our function, with respect to our losses and the current weights and biases. Take some time to play with this if you aren’t clear (and print things out!).</p>
 <div class="cell" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> linear_regression(X, w, b):</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> tf.matmul(X, w) <span class="op">+</span> b</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> squared_loss(y_hat, y):</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (y_hat <span class="op">-</span> tf.reshape(y, y_hat.shape))<span class="op">**</span><span class="dv">2</span> <span class="op">/</span> <span class="dv">2</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> sgd(params, grads, lr, batch_size):</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> param, grad <span class="kw">in</span> <span class="bu">zip</span>(params, grads):</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>        param.assign_sub(lr<span class="op">*</span>grad<span class="op">/</span>batch_size)</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>w <span class="op">=</span> tf.Variable(tf.random.normal(shape<span class="op">=</span>(<span class="dv">2</span>, <span class="dv">1</span>), mean<span class="op">=</span><span class="dv">0</span>, stddev<span class="op">=</span><span class="fl">0.01</span>),</span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>                trainable<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> tf.Variable(tf.zeros(<span class="dv">1</span>), trainable<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>lr <span class="op">=</span> <span class="fl">0.03</span></span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>num_epochs <span class="op">=</span> <span class="dv">3</span></span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>net <span class="op">=</span> linear_regression</span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>loss <span class="op">=</span> squared_loss</span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> epoch <span class="kw">in</span> <span class="bu">range</span>(num_epochs):</span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> X, y <span class="kw">in</span> data_iter(batch_size<span class="op">=</span><span class="dv">10</span>, features<span class="op">=</span>features, labels<span class="op">=</span>labels):</span>
-<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>        <span class="cf">with</span> tf.GradientTape() <span class="im">as</span> g:</span>
-<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>            l <span class="op">=</span> loss(net(X, w, b), y)</span>
-<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>        dw, db <span class="op">=</span> g.gradient(l, [w, b])</span>
-<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>        sgd([w, b], [dw, db], lr, batch_size<span class="op">=</span><span class="dv">10</span>)</span>
-<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>    train_l <span class="op">=</span> loss(net(features, w, b), labels)</span>
-<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Epoch </span><span class="sc">{</span>epoch<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss">, loss </span><span class="sc">{</span><span class="bu">float</span>(tf.reduce_mean(train_l))<span class="sc">:f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1"></a><span class="kw">def</span> linear_regression(X, w, b):</span>
+<span id="cb7-2"><a href="#cb7-2"></a>    <span class="cf">return</span> tf.matmul(X, w) <span class="op">+</span> b</span>
+<span id="cb7-3"><a href="#cb7-3"></a></span>
+<span id="cb7-4"><a href="#cb7-4"></a><span class="kw">def</span> squared_loss(y_hat, y):</span>
+<span id="cb7-5"><a href="#cb7-5"></a>    <span class="cf">return</span> (y_hat <span class="op">-</span> tf.reshape(y, y_hat.shape))<span class="op">**</span><span class="dv">2</span> <span class="op">/</span> <span class="dv">2</span></span>
+<span id="cb7-6"><a href="#cb7-6"></a></span>
+<span id="cb7-7"><a href="#cb7-7"></a><span class="kw">def</span> sgd(params, grads, lr, batch_size):</span>
+<span id="cb7-8"><a href="#cb7-8"></a>    <span class="cf">for</span> param, grad <span class="kw">in</span> <span class="bu">zip</span>(params, grads):</span>
+<span id="cb7-9"><a href="#cb7-9"></a>        param.assign_sub(lr<span class="op">*</span>grad<span class="op">/</span>batch_size)</span>
+<span id="cb7-10"><a href="#cb7-10"></a></span>
+<span id="cb7-11"><a href="#cb7-11"></a>w <span class="op">=</span> tf.Variable(tf.random.normal(shape<span class="op">=</span>(<span class="dv">2</span>, <span class="dv">1</span>), mean<span class="op">=</span><span class="dv">0</span>, stddev<span class="op">=</span><span class="fl">0.01</span>),</span>
+<span id="cb7-12"><a href="#cb7-12"></a>                trainable<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb7-13"><a href="#cb7-13"></a>b <span class="op">=</span> tf.Variable(tf.zeros(<span class="dv">1</span>), trainable<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb7-14"><a href="#cb7-14"></a></span>
+<span id="cb7-15"><a href="#cb7-15"></a>lr <span class="op">=</span> <span class="fl">0.03</span></span>
+<span id="cb7-16"><a href="#cb7-16"></a>num_epochs <span class="op">=</span> <span class="dv">3</span></span>
+<span id="cb7-17"><a href="#cb7-17"></a>net <span class="op">=</span> linear_regression</span>
+<span id="cb7-18"><a href="#cb7-18"></a>loss <span class="op">=</span> squared_loss</span>
+<span id="cb7-19"><a href="#cb7-19"></a></span>
+<span id="cb7-20"><a href="#cb7-20"></a></span>
+<span id="cb7-21"><a href="#cb7-21"></a><span class="cf">for</span> epoch <span class="kw">in</span> <span class="bu">range</span>(num_epochs):</span>
+<span id="cb7-22"><a href="#cb7-22"></a>    <span class="cf">for</span> X, y <span class="kw">in</span> data_iter(batch_size<span class="op">=</span><span class="dv">10</span>, features<span class="op">=</span>features, labels<span class="op">=</span>labels):</span>
+<span id="cb7-23"><a href="#cb7-23"></a>        <span class="cf">with</span> tf.GradientTape() <span class="im">as</span> g:</span>
+<span id="cb7-24"><a href="#cb7-24"></a>            l <span class="op">=</span> loss(net(X, w, b), y)</span>
+<span id="cb7-25"><a href="#cb7-25"></a>        dw, db <span class="op">=</span> g.gradient(l, [w, b])</span>
+<span id="cb7-26"><a href="#cb7-26"></a>        sgd([w, b], [dw, db], lr, batch_size<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb7-27"><a href="#cb7-27"></a>    train_l <span class="op">=</span> loss(net(features, w, b), labels)</span>
+<span id="cb7-28"><a href="#cb7-28"></a>    <span class="bu">print</span>(<span class="ss">f"Epoch </span><span class="sc">{</span>epoch<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss">, loss </span><span class="sc">{</span><span class="bu">float</span>(tf.reduce_mean(train_l))<span class="sc">:f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>This is an abrupt stop, because I’ve got yet another thing I’d like to obsess about. Coming soon!</p>
 

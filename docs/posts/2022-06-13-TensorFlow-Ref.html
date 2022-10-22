@@ -8,8 +8,9 @@
 
 <meta name="author" content="Darpan Ganatra">
 <meta name="dcterms.date" content="2022-06-13">
+<meta name="description" content="Self-explanatory. I’ll add the places I used here d2l.ai">
 
-<title>Math and rambling - TensorFlow Refrence</title>
+<title>Math and rambling - TensorFlow Reference</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -129,7 +130,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <link rel="stylesheet" href="../styles.css">
 </head>
 
-<body class="nav-fixed fullcontent">
+<body class="nav-fixed">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -168,9 +169,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">TensorFlow Refrence</h1>
-            <p class="subtitle lead">Self-explanatory. I’ll add the places I used here d2l.ai</p>
-                                <div class="quarto-categories">
+      <h1 class="title">TensorFlow Reference</h1>
+                  <div>
+        <div class="description">
+          Self-explanatory. I’ll add the places I used here d2l.ai
+        </div>
+      </div>
+                          <div class="quarto-categories">
                 <div class="quarto-category">jupyter</div>
                 <div class="quarto-category">python</div>
                 <div class="quarto-category">tensorflow</div>
@@ -201,7 +206,29 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#creating-a-tensor" id="toc-creating-a-tensor" class="nav-link active" data-scroll-target="#creating-a-tensor">Creating a tensor</a>
+  <ul class="collapse">
+  <li><a href="#tensor-attributes" id="toc-tensor-attributes" class="nav-link" data-scroll-target="#tensor-attributes">Tensor Attributes</a>
+  <ul class="collapse">
+  <li><a href="#tensor-shape" id="toc-tensor-shape" class="nav-link" data-scroll-target="#tensor-shape">Tensor Shape</a></li>
+  <li><a href="#tensor-data-type" id="toc-tensor-data-type" class="nav-link" data-scroll-target="#tensor-data-type">Tensor Data Type</a></li>
+  </ul></li>
+  <li><a href="#changing-a-tensor" id="toc-changing-a-tensor" class="nav-link" data-scroll-target="#changing-a-tensor">Changing a Tensor</a></li>
+  <li><a href="#ones-random-constant-tensor" id="toc-ones-random-constant-tensor" class="nav-link" data-scroll-target="#ones-random-constant-tensor">Ones, Random, Constant Tensor</a></li>
+  </ul></li>
+  <li><a href="#tensor-operations" id="toc-tensor-operations" class="nav-link" data-scroll-target="#tensor-operations">Tensor Operations</a>
+  <ul class="collapse">
+  <li><a href="#dot-product" id="toc-dot-product" class="nav-link" data-scroll-target="#dot-product">Dot Product</a></li>
+  <li><a href="#broadcasting" id="toc-broadcasting" class="nav-link" data-scroll-target="#broadcasting">Broadcasting</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
 <!-- main -->
 <main class="content quarto-banner-title-block" id="quarto-document-content">
 
@@ -209,26 +236,26 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 
 <div class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tensorflow <span class="im">as</span> tf</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1"></a><span class="im">import</span> tensorflow <span class="im">as</span> tf</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="creating-a-tensor" class="level1">
 <h1>Creating a tensor</h1>
 <p>You should always assign the <code>dtype</code> when creating a tensor.</p>
 <div class="cell" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> tf.<span class="bu">range</span>(start<span class="op">=</span><span class="dv">12</span>, dtype<span class="op">=</span>tf.float32)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1"></a>x <span class="op">=</span> tf.<span class="bu">range</span>(start<span class="op">=</span><span class="dv">12</span>, dtype<span class="op">=</span>tf.float32)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="tensor-attributes" class="level2">
 <h2 class="anchored" data-anchor-id="tensor-attributes">Tensor Attributes</h2>
 <section id="tensor-shape" class="level3">
 <h3 class="anchored" data-anchor-id="tensor-shape">Tensor Shape</h3>
 <div class="cell" data-execution_count="7">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>x.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1"></a>x.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="7">
 <pre><code>TensorShape([12])</code></pre>
 </div>
 </div>
 <div class="cell" data-execution_count="9">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>tf.size(x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1"></a>tf.size(x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="9">
 <pre><code>&lt;tf.Tensor: shape=(), dtype=int32, numpy=12&gt;</code></pre>
 </div>
@@ -237,7 +264,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <section id="tensor-data-type" class="level3">
 <h3 class="anchored" data-anchor-id="tensor-data-type">Tensor Data Type</h3>
 <div class="cell" data-execution_count="12">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>x.dtype</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1"></a>x.dtype</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="12">
 <pre><code>tf.float32</code></pre>
 </div>
@@ -252,14 +279,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li>If you know all but one of the dimensions, you can leave the unknown dimension as <code>-1</code>: <code>(# of rows, -1)</code></li>
 </ul>
 <div class="cell" data-execution_count="16">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1"></a><span class="bu">print</span>(x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>tf.Tensor([ 0.  1.  2.  3.  4.  5.  6.  7.  8.  9. 10. 11.], shape=(12,), dtype=float32)</code></pre>
 </div>
 </div>
 <p>Here I’m explcitly defining the reshaping as (3,4)</p>
 <div class="cell" data-execution_count="17">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tf.reshape(x, shape<span class="op">=</span>(<span class="dv">3</span>, <span class="dv">4</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1"></a><span class="bu">print</span>(tf.reshape(x, shape<span class="op">=</span>(<span class="dv">3</span>, <span class="dv">4</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>tf.Tensor(
 [[ 0.  1.  2.  3.]
@@ -269,7 +296,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <p>Here I left the column number blank, and it filled in automatically:</p>
 <div class="cell" data-execution_count="18">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tf.reshape(x, shape<span class="op">=</span>(<span class="dv">3</span>, <span class="op">-</span><span class="dv">1</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1"></a><span class="bu">print</span>(tf.reshape(x, shape<span class="op">=</span>(<span class="dv">3</span>, <span class="op">-</span><span class="dv">1</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>tf.Tensor(
 [[ 0.  1.  2.  3.]
@@ -281,7 +308,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <section id="ones-random-constant-tensor" class="level2">
 <h2 class="anchored" data-anchor-id="ones-random-constant-tensor">Ones, Random, Constant Tensor</h2>
 <div class="cell" data-execution_count="21">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tf.ones(shape<span class="op">=</span>(<span class="dv">3</span>, <span class="dv">4</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1"></a><span class="bu">print</span>(tf.ones(shape<span class="op">=</span>(<span class="dv">3</span>, <span class="dv">4</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>tf.Tensor(
 [[1. 1. 1. 1.]
@@ -291,7 +318,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <p>Keep in mind you can change a lot of parameters w.r.t. $, , $ etc. since this is a random normal distribution. There are more distributions as well if need be.</p>
 <div class="cell" data-execution_count="22">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tf.random.normal(shape<span class="op">=</span>(<span class="dv">3</span>, <span class="dv">4</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1"></a><span class="bu">print</span>(tf.random.normal(shape<span class="op">=</span>(<span class="dv">3</span>, <span class="dv">4</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>tf.Tensor(
 [[ 2.202327   -0.26792583 -0.74406874 -0.6372847 ]
@@ -300,7 +327,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 </div>
 <div class="cell" data-execution_count="24">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tf.constant([[<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>], [<span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>]]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1"></a><span class="bu">print</span>(tf.constant([[<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>], [<span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>]]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>tf.Tensor(
 [[1 2 3]
@@ -332,40 +359,40 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 \]</span></p>
 <p>Example:</p>
 <div class="cell" data-execution_count="25">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> tf.constant([<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">8</span>])</span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> tf.constant([<span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1"></a>x <span class="op">=</span> tf.constant([<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">8</span>])</span>
+<span id="cb21-2"><a href="#cb21-2"></a>y <span class="op">=</span> tf.constant([<span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Addition:</p>
 <div class="cell" data-execution_count="27">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(x <span class="op">+</span> y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1"></a><span class="bu">print</span>(x <span class="op">+</span> y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>tf.Tensor([ 3  4  6 10], shape=(4,), dtype=int32)</code></pre>
 </div>
 </div>
 <p>Subtraction</p>
 <div class="cell" data-execution_count="28">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(x <span class="op">-</span> y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1"></a><span class="bu">print</span>(x <span class="op">-</span> y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>tf.Tensor([-1  0  2  6], shape=(4,), dtype=int32)</code></pre>
 </div>
 </div>
 <p>Multiplication</p>
 <div class="cell" data-execution_count="29">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(x <span class="op">*</span> y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1"></a><span class="bu">print</span>(x <span class="op">*</span> y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>tf.Tensor([ 2  4  8 16], shape=(4,), dtype=int32)</code></pre>
 </div>
 </div>
 <p>Division</p>
 <div class="cell" data-execution_count="30">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(x <span class="op">/</span> y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1"></a><span class="bu">print</span>(x <span class="op">/</span> y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>tf.Tensor([0.5 1.  2.  4. ], shape=(4,), dtype=float64)</code></pre>
 </div>
 </div>
 <p>Exponentiation</p>
 <div class="cell" data-execution_count="31">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(x <span class="op">**</span> y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1"></a><span class="bu">print</span>(x <span class="op">**</span> y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>tf.Tensor([ 1  4 16 64], shape=(4,), dtype=int32)</code></pre>
 </div>
@@ -382,7 +409,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 \bar{x} \bullet \bar{y} = \sum_{i=1}^{n} x_i \cdot y_i
 \]</span></p>
 <div class="cell" data-execution_count="33">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>tf.tensordot(tf.constant([<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>]), tf.constant([<span class="dv">8</span>, <span class="dv">8</span>, <span class="dv">8</span>]), axes<span class="op">=</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1"></a>tf.tensordot(tf.constant([<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>]), tf.constant([<span class="dv">8</span>, <span class="dv">8</span>, <span class="dv">8</span>]), axes<span class="op">=</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="33">
 <pre><code>&lt;tf.Tensor: shape=(), dtype=int32, numpy=48&gt;</code></pre>
 </div>
@@ -392,16 +419,16 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2 class="anchored" data-anchor-id="broadcasting">Broadcasting</h2>
 <p>Look at the explanation <a href="https://numpy.org/doc/stable/user/basics.broadcasting.html">NumPy provides</a></p>
 <div class="cell" data-execution_count="60">
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> tf.reshape(tf.<span class="bu">range</span>(start<span class="op">=</span><span class="dv">12</span>), shape<span class="op">=</span>(<span class="dv">3</span>, <span class="dv">4</span>))</span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> tf.<span class="bu">range</span>(start<span class="op">=</span><span class="dv">4</span>)</span>
-<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"================= Matrix of shape 3x4 ================="</span>)</span>
-<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(x.numpy(), <span class="st">"</span><span class="ch">\n</span><span class="st">"</span>)</span>
-<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"================= Vector of shape 1x3 ================="</span>)</span>
-<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(y.numpy())</span>
-<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"================== Sum of shape 3x4 ==================="</span>)</span>
-<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tf.math.add(x, y).numpy())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1"></a>x <span class="op">=</span> tf.reshape(tf.<span class="bu">range</span>(start<span class="op">=</span><span class="dv">12</span>), shape<span class="op">=</span>(<span class="dv">3</span>, <span class="dv">4</span>))</span>
+<span id="cb34-2"><a href="#cb34-2"></a>y <span class="op">=</span> tf.<span class="bu">range</span>(start<span class="op">=</span><span class="dv">4</span>)</span>
+<span id="cb34-3"><a href="#cb34-3"></a></span>
+<span id="cb34-4"><a href="#cb34-4"></a><span class="bu">print</span>(<span class="st">"================= Matrix of shape 3x4 ================="</span>)</span>
+<span id="cb34-5"><a href="#cb34-5"></a><span class="bu">print</span>(x.numpy(), <span class="st">"</span><span class="ch">\n</span><span class="st">"</span>)</span>
+<span id="cb34-6"><a href="#cb34-6"></a><span class="bu">print</span>(<span class="st">"================= Vector of shape 1x3 ================="</span>)</span>
+<span id="cb34-7"><a href="#cb34-7"></a><span class="bu">print</span>(y.numpy())</span>
+<span id="cb34-8"><a href="#cb34-8"></a></span>
+<span id="cb34-9"><a href="#cb34-9"></a><span class="bu">print</span>(<span class="st">"================== Sum of shape 3x4 ==================="</span>)</span>
+<span id="cb34-10"><a href="#cb34-10"></a><span class="bu">print</span>(tf.math.add(x, y).numpy())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>================= Matrix of shape 3x4 =================
 [[ 0  1  2  3]

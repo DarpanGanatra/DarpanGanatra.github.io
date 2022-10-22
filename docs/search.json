@@ -88,7 +88,7 @@
     "href": "index.html",
     "title": "Learning how to learn",
     "section": "",
-    "text": "Because honestly why not?\n\n\n\n\njupyter\n\n\npython\n\n\ntensorflow\n\n\nlinear-regression\n\n\n\n\n\n\n\n\n\n\n\nJun 13, 2022\n\n\nDarpan Ganatra\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nIt’s been a while since I’ve brushed up on my time series forecasting techniques. Time to get on it (this is a work in progress).\n\n\n\n\njupyter\n\n\npython\n\n\ntimeseries\n\n\n\n\n\n\n\n\n\n\n\nJun 3, 2022\n\n\nDarpan Ganatra\n\n\n\n\n\n\n  \n\n\n\n\n\nWhat the heck is logistic regression and how do you implement it?\n\n\n\n\njupyter\n\n\npython\n\n\nsklearn\n\n\nlogistic_regression\n\n\n\n\n\n\n\n\n\n\n\nJun 2, 2022\n\n\nDarpan Ganatra\n\n\n\n\n\n\n  \n\n\n\n\n\nThe first in a series of tutorials to model ODEs and systems of ODEs in Python.\n\n\n\n\njupyter\n\n\npython\n\n\nmodelling\n\n\ncomp_bio\n\n\n\n\n\n\n\n\n\n\n\nMay 19, 2022\n\n\nDarpan Ganatra\n\n\n\n\n\n\nNo matching items"
+    "text": "Date\n\n\nTitle\n\n\nDescription\n\n\n\n\n\n\nJun 13, 2022\n\n\nTensorFlow Reference\n\n\nSelf-explanatory. I’ll add the places I used here d2l.ai\n\n\n\n\nJun 13, 2022\n\n\nLinear Regression with minibatch gradient descent in TensorFlow\n\n\nBecause honestly why not?\n\n\n\n\nJun 6, 2022\n\n\nTime Series Analysis with Python (Part 2)\n\n\n\n\n\n\n\nJun 3, 2022\n\n\nTime Series Analysis with Python\n\n\nIt’s been a while since I’ve brushed up on my time series forecasting techniques. Time to get on it (this is a work in progress).\n\n\n\n\nJun 2, 2022\n\n\nLogistic Regression\n\n\nWhat the heck is logistic regression and how do you implement it?\n\n\n\n\nMay 19, 2022\n\n\nModelling Differential Equations in Python\n\n\nThe first in a series of tutorials to model ODEs and systems of ODEs in Python.\n\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "about.html",
@@ -103,5 +103,68 @@
     "title": "Darpan Ganatra",
     "section": "Education",
     "text": "Education\nNew Jersey Institute of Technology | Newark, NJ\nMSc in Data Science, Statistics Track\nRutgers University, New Brunswick | New Brunswick, NJ\nB.A. in Mathematics"
+  },
+  {
+    "objectID": "posts/2022-06-13-TensorFlow-Ref.html",
+    "href": "posts/2022-06-13-TensorFlow-Ref.html",
+    "title": "TensorFlow Reference",
+    "section": "",
+    "text": "import tensorflow as tf"
+  },
+  {
+    "objectID": "posts/2022-06-13-TensorFlow-Ref.html#tensor-attributes",
+    "href": "posts/2022-06-13-TensorFlow-Ref.html#tensor-attributes",
+    "title": "TensorFlow Reference",
+    "section": "Tensor Attributes",
+    "text": "Tensor Attributes\n\nTensor Shape\n\nx.shape\n\nTensorShape([12])\n\n\n\ntf.size(x)\n\n<tf.Tensor: shape=(), dtype=int32, numpy=12>\n\n\n\n\nTensor Data Type\n\nx.dtype\n\ntf.float32"
+  },
+  {
+    "objectID": "posts/2022-06-13-TensorFlow-Ref.html#changing-a-tensor",
+    "href": "posts/2022-06-13-TensorFlow-Ref.html#changing-a-tensor",
+    "title": "TensorFlow Reference",
+    "section": "Changing a Tensor",
+    "text": "Changing a Tensor\nUse tf.reshape\n\nWill accept the tensor, and the shape, with the shape in the form of: (# of rows, # of columns)\nIf you know all but one of the dimensions, you can leave the unknown dimension as -1: (# of rows, -1)\n\n\nprint(x)\n\ntf.Tensor([ 0.  1.  2.  3.  4.  5.  6.  7.  8.  9. 10. 11.], shape=(12,), dtype=float32)\n\n\nHere I’m explcitly defining the reshaping as (3,4)\n\nprint(tf.reshape(x, shape=(3, 4)))\n\ntf.Tensor(\n[[ 0.  1.  2.  3.]\n [ 4.  5.  6.  7.]\n [ 8.  9. 10. 11.]], shape=(3, 4), dtype=float32)\n\n\nHere I left the column number blank, and it filled in automatically:\n\nprint(tf.reshape(x, shape=(3, -1)))\n\ntf.Tensor(\n[[ 0.  1.  2.  3.]\n [ 4.  5.  6.  7.]\n [ 8.  9. 10. 11.]], shape=(3, 4), dtype=float32)"
+  },
+  {
+    "objectID": "posts/2022-06-13-TensorFlow-Ref.html#ones-random-constant-tensor",
+    "href": "posts/2022-06-13-TensorFlow-Ref.html#ones-random-constant-tensor",
+    "title": "TensorFlow Reference",
+    "section": "Ones, Random, Constant Tensor",
+    "text": "Ones, Random, Constant Tensor\n\nprint(tf.ones(shape=(3, 4)))\n\ntf.Tensor(\n[[1. 1. 1. 1.]\n [1. 1. 1. 1.]\n [1. 1. 1. 1.]], shape=(3, 4), dtype=float32)\n\n\nKeep in mind you can change a lot of parameters w.r.t. $, , $ etc. since this is a random normal distribution. There are more distributions as well if need be.\n\nprint(tf.random.normal(shape=(3, 4)))\n\ntf.Tensor(\n[[ 2.202327   -0.26792583 -0.74406874 -0.6372847 ]\n [ 0.46985132 -0.3888988   0.47005928  0.08380948]\n [-0.6244405   0.47245353 -1.8344202  -1.2178894 ]], shape=(3, 4), dtype=float32)\n\n\n\nprint(tf.constant([[1, 2, 3], [4, 5, 6]]))\n\ntf.Tensor(\n[[1 2 3]\n [4 5 6]], shape=(2, 3), dtype=int32)"
+  },
+  {
+    "objectID": "posts/2022-06-13-TensorFlow-Ref.html#dot-product",
+    "href": "posts/2022-06-13-TensorFlow-Ref.html#dot-product",
+    "title": "TensorFlow Reference",
+    "section": "Dot Product",
+    "text": "Dot Product\nIf:\n\n\\(\\bar{x} := [x_1, \\dots , x_n]\\)\n\\(\\bar{y} := [y_1, \\dots, y_n]\\)\n\nThen the dot product (\\(\\bullet\\)) is defined:\n\\[\n\\bar{x} \\bullet \\bar{y} = \\sum_{i=1}^{n} x_i \\cdot y_i\n\\]\n\ntf.tensordot(tf.constant([1, 2, 3]), tf.constant([8, 8, 8]), axes=1)\n\n<tf.Tensor: shape=(), dtype=int32, numpy=48>"
+  },
+  {
+    "objectID": "posts/2022-06-13-TensorFlow-Ref.html#broadcasting",
+    "href": "posts/2022-06-13-TensorFlow-Ref.html#broadcasting",
+    "title": "TensorFlow Reference",
+    "section": "Broadcasting",
+    "text": "Broadcasting\nLook at the explanation NumPy provides\n\nx = tf.reshape(tf.range(start=12), shape=(3, 4))\ny = tf.range(start=4)\n\nprint(\"================= Matrix of shape 3x4 =================\")\nprint(x.numpy(), \"\\n\")\nprint(\"================= Vector of shape 1x3 =================\")\nprint(y.numpy())\n\nprint(\"================== Sum of shape 3x4 ===================\")\nprint(tf.math.add(x, y).numpy())\n\n================= Matrix of shape 3x4 =================\n[[ 0  1  2  3]\n [ 4  5  6  7]\n [ 8  9 10 11]] \n\n================= Vector of shape 1x3 =================\n[0 1 2 3]\n================== Sum of shape 3x4 ===================\n[[ 0  2  4  6]\n [ 4  6  8 10]\n [ 8 10 12 14]]"
+  },
+  {
+    "objectID": "posts/2022-06-06-Time-Series-Analysis-Pt2.html",
+    "href": "posts/2022-06-06-Time-Series-Analysis-Pt2.html",
+    "title": "Time Series Analysis with Python (Part 2)",
+    "section": "",
+    "text": "Code\nimport matplotlib.pyplot as plt\nimport numpy as np\nimport pandas as pd\n\ndf = pd.read_csv(\n    \"https://raw.githubusercontent.com/jbrownlee/Datasets/master/airline-passengers.csv\"\n)\n\ndf.Month = pd.DatetimeIndex(df.Month, freq=\"MS\")\ndf = df.set_index(\"Month\")"
+  },
+  {
+    "objectID": "posts/2022-06-06-Time-Series-Analysis-Pt2.html#additive-decomposition",
+    "href": "posts/2022-06-06-Time-Series-Analysis-Pt2.html#additive-decomposition",
+    "title": "Time Series Analysis with Python (Part 2)",
+    "section": "Additive Decomposition",
+    "text": "Additive Decomposition\n\\[\ny_{t} = S_t + T_t + R_t\n\\]\nThis is relatively easy to understand when we make an additive time series. Here’s an intuitive(-ish) example:\n\n\nCode\nt = np.linspace(-2 * np.pi, 2 * np.pi)\ns_t = np.sin(2 * t)\nt_t = np.linspace(start=1, stop=len(t) / 5, num=len(t))\nr_t = np.random.randn(len(t))\n\nplt.figure(figsize=(14, 7))\nplt.title(\"Additive Time Series\")\nplt.plot(t, s_t + t_t + r_t, label=\"Combined Value\")\nplt.xlim(left=min(t), right=max(t))\nplt.legend()\nplt.show()\n\n\n\n\n\nBelow we can actually see the separate components I used to make this plot! Notice how each of the series added together creates the final plot above. That’s additive seasonal decomposition in a nutshell. Finding those components.\n\n\nCode\nfig, ax = plt.subplots(nrows=3, ncols=1, figsize=(14, 7), sharex=True)\nax[0].plot(t, s_t, label=r\"$S_{t}$\", color=\"blue\")\nax[1].plot(t, t_t, label=r\"$T_{t}$\", color=\"red\")\nax[2].plot(t, r_t, label=r\"$R_{t}$\", color=\"green\")\n\nax[0].set_xlim(left=min(t), right=max(t))\n\nax[0].set_title(r\"Seasonal Pattern ($sin(2*t)$)\")\nax[1].set_title(\"Trend\")\nax[2].set_title(\"Remainder\")\nfig.legend()\nplt.show()"
+  },
+  {
+    "objectID": "posts/2022-06-06-Time-Series-Analysis-Pt2.html#multiplicative-decomposition",
+    "href": "posts/2022-06-06-Time-Series-Analysis-Pt2.html#multiplicative-decomposition",
+    "title": "Time Series Analysis with Python (Part 2)",
+    "section": "Multiplicative Decomposition",
+    "text": "Multiplicative Decomposition\nMultiplicative decomposition is the same as additive (in a way) but with multiplication. I know, shocking. Ridiculously shocking.\n\\[\ny_{t} = S_t * T_t * R_t\n\\]\nThere’s one thing to note that actually is interesting. There’s an increase in the variance from what we see as “trend”.\n\n\nCode\nplt.figure(figsize=(14, 7))\nplt.title(\"Multiplicative Time Series\")\nplt.plot(t, s_t * t_t, label=\"Combined Value\", color=\"blue\")\nplt.axhline(y=0, linestyle=\"--\", color=\"grey\")\nplt.xlim(left=min(t), right=max(t))\nplt.legend()\nplt.show()\n\n\n\n\n\nKeep in mind the components are exactly the same as previously.\n\nfrom statsmodels.tsa.seasonal import STL\nfrom statsmodels.tsa.seasonal import seasonal_decompose\n\n\nmodel = seasonal_decompose(x = df['Passengers'], model = 'multiplicative')\n\n\nstl = STL(df)\nres = stl.fit()\nfig = res.plot()"
   }
 ]

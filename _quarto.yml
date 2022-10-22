@@ -13,5 +13,8 @@ website:
         href: https://twitter.com/DarpanGanatra
 format:
   html:
-    theme: sandstorm
+    toc: true
+    theme: litera
+    highlight-style: a11y
     css: styles.css
+    code-line-numbers: true

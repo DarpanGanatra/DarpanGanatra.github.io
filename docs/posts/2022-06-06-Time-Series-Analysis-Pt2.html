@@ -129,7 +129,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <link rel="stylesheet" href="../styles.css">
 </head>
 
-<body class="nav-fixed fullcontent">
+<body class="nav-fixed">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -169,7 +169,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
       <h1 class="title">Time Series Analysis with Python (Part 2)</h1>
-            <p class="subtitle lead">The second in the series!</p>
+            <p class="subtitle lead">(WIP) The second in the series!</p>
                                 <div class="quarto-categories">
                 <div class="quarto-category">jupyter</div>
                 <div class="quarto-category">python</div>
@@ -201,7 +201,19 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#decomposition" id="toc-decomposition" class="nav-link active" data-scroll-target="#decomposition">Decomposition</a>
+  <ul class="collapse">
+  <li><a href="#additive-decomposition" id="toc-additive-decomposition" class="nav-link" data-scroll-target="#additive-decomposition">Additive Decomposition</a></li>
+  <li><a href="#multiplicative-decomposition" id="toc-multiplicative-decomposition" class="nav-link" data-scroll-target="#multiplicative-decomposition">Multiplicative Decomposition</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
 <!-- main -->
 <main class="content quarto-banner-title-block" id="quarto-document-content">
 
@@ -211,16 +223,16 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="cell" data-execution_count="34">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"https://raw.githubusercontent.com/jbrownlee/Datasets/master/airline-passengers.csv"</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>df.Month <span class="op">=</span> pd.DatetimeIndex(df.Month, freq<span class="op">=</span><span class="st">"MS"</span>)</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df.set_index(<span class="st">"Month"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-4"><a href="#cb1-4"></a></span>
+<span id="cb1-5"><a href="#cb1-5"></a>df <span class="op">=</span> pd.read_csv(</span>
+<span id="cb1-6"><a href="#cb1-6"></a>    <span class="st">"https://raw.githubusercontent.com/jbrownlee/Datasets/master/airline-passengers.csv"</span></span>
+<span id="cb1-7"><a href="#cb1-7"></a>)</span>
+<span id="cb1-8"><a href="#cb1-8"></a></span>
+<span id="cb1-9"><a href="#cb1-9"></a>df.Month <span class="op">=</span> pd.DatetimeIndex(df.Month, freq<span class="op">=</span><span class="st">"MS"</span>)</span>
+<span id="cb1-10"><a href="#cb1-10"></a>df <span class="op">=</span> df.set_index(<span class="st">"Month"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <section id="decomposition" class="level1">
@@ -245,17 +257,17 @@ y_{t} = S_t + T_t + R_t
 <div class="cell" data-execution_count="28">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">2</span> <span class="op">*</span> np.pi, <span class="dv">2</span> <span class="op">*</span> np.pi)</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>s_t <span class="op">=</span> np.sin(<span class="dv">2</span> <span class="op">*</span> t)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>t_t <span class="op">=</span> np.linspace(start<span class="op">=</span><span class="dv">1</span>, stop<span class="op">=</span><span class="bu">len</span>(t) <span class="op">/</span> <span class="dv">5</span>, num<span class="op">=</span><span class="bu">len</span>(t))</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>r_t <span class="op">=</span> np.random.randn(<span class="bu">len</span>(t))</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">14</span>, <span class="dv">7</span>))</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Additive Time Series"</span>)</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>plt.plot(t, s_t <span class="op">+</span> t_t <span class="op">+</span> r_t, label<span class="op">=</span><span class="st">"Combined Value"</span>)</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>plt.xlim(left<span class="op">=</span><span class="bu">min</span>(t), right<span class="op">=</span><span class="bu">max</span>(t))</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1"></a>t <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">2</span> <span class="op">*</span> np.pi, <span class="dv">2</span> <span class="op">*</span> np.pi)</span>
+<span id="cb2-2"><a href="#cb2-2"></a>s_t <span class="op">=</span> np.sin(<span class="dv">2</span> <span class="op">*</span> t)</span>
+<span id="cb2-3"><a href="#cb2-3"></a>t_t <span class="op">=</span> np.linspace(start<span class="op">=</span><span class="dv">1</span>, stop<span class="op">=</span><span class="bu">len</span>(t) <span class="op">/</span> <span class="dv">5</span>, num<span class="op">=</span><span class="bu">len</span>(t))</span>
+<span id="cb2-4"><a href="#cb2-4"></a>r_t <span class="op">=</span> np.random.randn(<span class="bu">len</span>(t))</span>
+<span id="cb2-5"><a href="#cb2-5"></a></span>
+<span id="cb2-6"><a href="#cb2-6"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">14</span>, <span class="dv">7</span>))</span>
+<span id="cb2-7"><a href="#cb2-7"></a>plt.title(<span class="st">"Additive Time Series"</span>)</span>
+<span id="cb2-8"><a href="#cb2-8"></a>plt.plot(t, s_t <span class="op">+</span> t_t <span class="op">+</span> r_t, label<span class="op">=</span><span class="st">"Combined Value"</span>)</span>
+<span id="cb2-9"><a href="#cb2-9"></a>plt.xlim(left<span class="op">=</span><span class="bu">min</span>(t), right<span class="op">=</span><span class="bu">max</span>(t))</span>
+<span id="cb2-10"><a href="#cb2-10"></a>plt.legend()</span>
+<span id="cb2-11"><a href="#cb2-11"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <p><img src="2022-06-06-Time-Series-Analysis-Pt2_files/figure-html/cell-3-output-1.png" class="img-fluid"></p>
@@ -265,18 +277,18 @@ y_{t} = S_t + T_t + R_t
 <div class="cell" data-execution_count="20">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(nrows<span class="op">=</span><span class="dv">3</span>, ncols<span class="op">=</span><span class="dv">1</span>, figsize<span class="op">=</span>(<span class="dv">14</span>, <span class="dv">7</span>), sharex<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>].plot(t, s_t, label<span class="op">=</span><span class="vs">r"$S_</span><span class="sc">{t}</span><span class="vs">$"</span>, color<span class="op">=</span><span class="st">"blue"</span>)</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].plot(t, t_t, label<span class="op">=</span><span class="vs">r"$T_</span><span class="sc">{t}</span><span class="vs">$"</span>, color<span class="op">=</span><span class="st">"red"</span>)</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">2</span>].plot(t, r_t, label<span class="op">=</span><span class="vs">r"$R_</span><span class="sc">{t}</span><span class="vs">$"</span>, color<span class="op">=</span><span class="st">"green"</span>)</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>].set_xlim(left<span class="op">=</span><span class="bu">min</span>(t), right<span class="op">=</span><span class="bu">max</span>(t))</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>].set_title(<span class="vs">r"Seasonal Pattern ($sin(2*t)$)"</span>)</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].set_title(<span class="st">"Trend"</span>)</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">2</span>].set_title(<span class="st">"Remainder"</span>)</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>fig.legend()</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1"></a>fig, ax <span class="op">=</span> plt.subplots(nrows<span class="op">=</span><span class="dv">3</span>, ncols<span class="op">=</span><span class="dv">1</span>, figsize<span class="op">=</span>(<span class="dv">14</span>, <span class="dv">7</span>), sharex<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb3-2"><a href="#cb3-2"></a>ax[<span class="dv">0</span>].plot(t, s_t, label<span class="op">=</span><span class="vs">r"$S_</span><span class="sc">{t}</span><span class="vs">$"</span>, color<span class="op">=</span><span class="st">"blue"</span>)</span>
+<span id="cb3-3"><a href="#cb3-3"></a>ax[<span class="dv">1</span>].plot(t, t_t, label<span class="op">=</span><span class="vs">r"$T_</span><span class="sc">{t}</span><span class="vs">$"</span>, color<span class="op">=</span><span class="st">"red"</span>)</span>
+<span id="cb3-4"><a href="#cb3-4"></a>ax[<span class="dv">2</span>].plot(t, r_t, label<span class="op">=</span><span class="vs">r"$R_</span><span class="sc">{t}</span><span class="vs">$"</span>, color<span class="op">=</span><span class="st">"green"</span>)</span>
+<span id="cb3-5"><a href="#cb3-5"></a></span>
+<span id="cb3-6"><a href="#cb3-6"></a>ax[<span class="dv">0</span>].set_xlim(left<span class="op">=</span><span class="bu">min</span>(t), right<span class="op">=</span><span class="bu">max</span>(t))</span>
+<span id="cb3-7"><a href="#cb3-7"></a></span>
+<span id="cb3-8"><a href="#cb3-8"></a>ax[<span class="dv">0</span>].set_title(<span class="vs">r"Seasonal Pattern ($sin(2*t)$)"</span>)</span>
+<span id="cb3-9"><a href="#cb3-9"></a>ax[<span class="dv">1</span>].set_title(<span class="st">"Trend"</span>)</span>
+<span id="cb3-10"><a href="#cb3-10"></a>ax[<span class="dv">2</span>].set_title(<span class="st">"Remainder"</span>)</span>
+<span id="cb3-11"><a href="#cb3-11"></a>fig.legend()</span>
+<span id="cb3-12"><a href="#cb3-12"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <p><img src="2022-06-06-Time-Series-Analysis-Pt2_files/figure-html/cell-4-output-1.png" class="img-fluid"></p>
@@ -293,13 +305,13 @@ y_{t} = S_t * T_t * R_t
 <div class="cell" data-execution_count="33">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">14</span>, <span class="dv">7</span>))</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Multiplicative Time Series"</span>)</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>plt.plot(t, s_t <span class="op">*</span> t_t, label<span class="op">=</span><span class="st">"Combined Value"</span>, color<span class="op">=</span><span class="st">"blue"</span>)</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>plt.axhline(y<span class="op">=</span><span class="dv">0</span>, linestyle<span class="op">=</span><span class="st">"--"</span>, color<span class="op">=</span><span class="st">"grey"</span>)</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>plt.xlim(left<span class="op">=</span><span class="bu">min</span>(t), right<span class="op">=</span><span class="bu">max</span>(t))</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">14</span>, <span class="dv">7</span>))</span>
+<span id="cb4-2"><a href="#cb4-2"></a>plt.title(<span class="st">"Multiplicative Time Series"</span>)</span>
+<span id="cb4-3"><a href="#cb4-3"></a>plt.plot(t, s_t <span class="op">*</span> t_t, label<span class="op">=</span><span class="st">"Combined Value"</span>, color<span class="op">=</span><span class="st">"blue"</span>)</span>
+<span id="cb4-4"><a href="#cb4-4"></a>plt.axhline(y<span class="op">=</span><span class="dv">0</span>, linestyle<span class="op">=</span><span class="st">"--"</span>, color<span class="op">=</span><span class="st">"grey"</span>)</span>
+<span id="cb4-5"><a href="#cb4-5"></a>plt.xlim(left<span class="op">=</span><span class="bu">min</span>(t), right<span class="op">=</span><span class="bu">max</span>(t))</span>
+<span id="cb4-6"><a href="#cb4-6"></a>plt.legend()</span>
+<span id="cb4-7"><a href="#cb4-7"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <p><img src="2022-06-06-Time-Series-Analysis-Pt2_files/figure-html/cell-5-output-1.png" class="img-fluid"></p>
@@ -307,16 +319,16 @@ y_{t} = S_t * T_t * R_t
 </div>
 <p>Keep in mind the components are exactly the same as previously.</p>
 <div class="cell" data-execution_count="68">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> statsmodels.tsa.seasonal <span class="im">import</span> STL</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> statsmodels.tsa.seasonal <span class="im">import</span> seasonal_decompose</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1"></a><span class="im">from</span> statsmodels.tsa.seasonal <span class="im">import</span> STL</span>
+<span id="cb5-2"><a href="#cb5-2"></a><span class="im">from</span> statsmodels.tsa.seasonal <span class="im">import</span> seasonal_decompose</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-execution_count="54">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> seasonal_decompose(x <span class="op">=</span> df[<span class="st">'Passengers'</span>], model <span class="op">=</span> <span class="st">'multiplicative'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1"></a>model <span class="op">=</span> seasonal_decompose(x <span class="op">=</span> df[<span class="st">'Passengers'</span>], model <span class="op">=</span> <span class="st">'multiplicative'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-execution_count="70">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>stl <span class="op">=</span> STL(df)</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> stl.fit()</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> res.plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1"></a>stl <span class="op">=</span> STL(df)</span>
+<span id="cb7-2"><a href="#cb7-2"></a>res <span class="op">=</span> stl.fit()</span>
+<span id="cb7-3"><a href="#cb7-3"></a>fig <span class="op">=</span> res.plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <p><img src="2022-06-06-Time-Series-Analysis-Pt2_files/figure-html/cell-8-output-1.png" class="img-fluid"></p>
 </div>

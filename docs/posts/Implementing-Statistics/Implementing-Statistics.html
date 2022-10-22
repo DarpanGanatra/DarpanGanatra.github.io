@@ -8,6 +8,7 @@
 
 <meta name="author" content="Darpan Ganatra">
 <meta name="dcterms.date" content="2022-06-02">
+<meta name="description" content="What the heck is logistic regression and how do you implement it?">
 
 <title>Math and rambling - Logistic Regression</title>
 <style>
@@ -132,7 +133,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <link rel="stylesheet" href="../../styles.css">
 </head>
 
-<body class="nav-fixed fullcontent">
+<body class="nav-fixed">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -172,8 +173,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
       <h1 class="title">Logistic Regression</h1>
-            <p class="subtitle lead">What the heck is logistic regression and how do you implement it?</p>
-                                <div class="quarto-categories">
+                  <div>
+        <div class="description">
+          What the heck is logistic regression and how do you implement it?
+        </div>
+      </div>
+                          <div class="quarto-categories">
                 <div class="quarto-category">jupyter</div>
                 <div class="quarto-category">python</div>
                 <div class="quarto-category">sklearn</div>
@@ -205,7 +210,16 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#data-generation" id="toc-data-generation" class="nav-link active" data-scroll-target="#data-generation">Data Generation</a></li>
+  <li><a href="#model-building" id="toc-model-building" class="nav-link" data-scroll-target="#model-building">Model Building</a></li>
+  </ul>
+</nav>
+    </div>
 <!-- main -->
 <main class="content quarto-banner-title-block" id="quarto-document-content">
 
@@ -225,46 +239,46 @@ p(\bar{X}) = \dfrac{e^{\beta_{0} + \beta_{1}X_{1} + \dots + \beta_{p}X_{p}}}{1 +
 <div class="cell" data-execution_count="1">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> make_sample_data(minimum, maximum, resolution<span class="op">=</span><span class="dv">1</span>):</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co">    Creates a grid of data points with a rough boundary line separating them in 2D.</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co">    Basic rule is:</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co">    x - y + noise &gt;= -0.5</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co">    Args:</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co">        minimum      (int): Start point</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co">        maximum      (int): End point</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co">        resolution (float): How closely you want the points to be packed</span></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns:</span></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="co">        xx     (np.array): x coordinates</span></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co">        yy     (np.array): y coordinates</span></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="co">        target (np.array): 1/0 output array based on rule</span></span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    x1 <span class="op">=</span> np.arange(minimum, maximum, resolution)</span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    x2 <span class="op">=</span> np.arange(minimum, maximum, resolution)</span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    xx, yy <span class="op">=</span> np.meshgrid(x1, x2)</span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    target <span class="op">=</span> <span class="dv">10</span> <span class="op">*</span> (</span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>        xx <span class="op">-</span> yy <span class="op">+</span> np.random.randint(low<span class="op">=-</span><span class="dv">2</span>, high<span class="op">=</span><span class="dv">2</span>, size<span class="op">=</span>(<span class="bu">len</span>(xx), <span class="bu">len</span>(yy))) <span class="op">&gt;=</span> <span class="op">-</span><span class="fl">0.5</span></span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> xx, yy, target</span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>x_sample, y_sample, target_sample <span class="op">=</span> make_sample_data(<span class="dv">1</span>, <span class="dv">6</span>, resolution<span class="op">=</span><span class="fl">0.07</span>)</span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">8</span>))</span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Sample Data"</span>)</span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>plt.scatter(x_sample, y_sample, c<span class="op">=</span>target_sample)</span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>plt.xlim(left<span class="op">=</span><span class="bu">min</span>(x_sample[<span class="dv">0</span>]), right<span class="op">=</span><span class="bu">max</span>(x_sample[<span class="dv">0</span>]))</span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>plt.ylim(bottom<span class="op">=</span><span class="bu">min</span>(x_sample[<span class="dv">0</span>]), top<span class="op">=</span><span class="bu">max</span>(x_sample[<span class="dv">0</span>]))</span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="vs">r"$x_</span><span class="sc">{0}</span><span class="vs">$"</span>)</span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="vs">r"$x_</span><span class="sc">{1}</span><span class="vs">$"</span>)</span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-3"><a href="#cb1-3"></a></span>
+<span id="cb1-4"><a href="#cb1-4"></a></span>
+<span id="cb1-5"><a href="#cb1-5"></a><span class="kw">def</span> make_sample_data(minimum, maximum, resolution<span class="op">=</span><span class="dv">1</span>):</span>
+<span id="cb1-6"><a href="#cb1-6"></a>    <span class="co">"""</span></span>
+<span id="cb1-7"><a href="#cb1-7"></a><span class="co">    Creates a grid of data points with a rough boundary line separating them in 2D.</span></span>
+<span id="cb1-8"><a href="#cb1-8"></a></span>
+<span id="cb1-9"><a href="#cb1-9"></a><span class="co">    Basic rule is:</span></span>
+<span id="cb1-10"><a href="#cb1-10"></a><span class="co">    x - y + noise &gt;= -0.5</span></span>
+<span id="cb1-11"><a href="#cb1-11"></a></span>
+<span id="cb1-12"><a href="#cb1-12"></a><span class="co">    Args:</span></span>
+<span id="cb1-13"><a href="#cb1-13"></a><span class="co">        minimum      (int): Start point</span></span>
+<span id="cb1-14"><a href="#cb1-14"></a><span class="co">        maximum      (int): End point</span></span>
+<span id="cb1-15"><a href="#cb1-15"></a><span class="co">        resolution (float): How closely you want the points to be packed</span></span>
+<span id="cb1-16"><a href="#cb1-16"></a></span>
+<span id="cb1-17"><a href="#cb1-17"></a><span class="co">    Returns:</span></span>
+<span id="cb1-18"><a href="#cb1-18"></a><span class="co">        xx     (np.array): x coordinates</span></span>
+<span id="cb1-19"><a href="#cb1-19"></a><span class="co">        yy     (np.array): y coordinates</span></span>
+<span id="cb1-20"><a href="#cb1-20"></a><span class="co">        target (np.array): 1/0 output array based on rule</span></span>
+<span id="cb1-21"><a href="#cb1-21"></a><span class="co">    """</span></span>
+<span id="cb1-22"><a href="#cb1-22"></a>    x1 <span class="op">=</span> np.arange(minimum, maximum, resolution)</span>
+<span id="cb1-23"><a href="#cb1-23"></a>    x2 <span class="op">=</span> np.arange(minimum, maximum, resolution)</span>
+<span id="cb1-24"><a href="#cb1-24"></a>    xx, yy <span class="op">=</span> np.meshgrid(x1, x2)</span>
+<span id="cb1-25"><a href="#cb1-25"></a>    target <span class="op">=</span> <span class="dv">10</span> <span class="op">*</span> (</span>
+<span id="cb1-26"><a href="#cb1-26"></a>        xx <span class="op">-</span> yy <span class="op">+</span> np.random.randint(low<span class="op">=-</span><span class="dv">2</span>, high<span class="op">=</span><span class="dv">2</span>, size<span class="op">=</span>(<span class="bu">len</span>(xx), <span class="bu">len</span>(yy))) <span class="op">&gt;=</span> <span class="op">-</span><span class="fl">0.5</span></span>
+<span id="cb1-27"><a href="#cb1-27"></a>    )</span>
+<span id="cb1-28"><a href="#cb1-28"></a>    <span class="cf">return</span> xx, yy, target</span>
+<span id="cb1-29"><a href="#cb1-29"></a></span>
+<span id="cb1-30"><a href="#cb1-30"></a></span>
+<span id="cb1-31"><a href="#cb1-31"></a>x_sample, y_sample, target_sample <span class="op">=</span> make_sample_data(<span class="dv">1</span>, <span class="dv">6</span>, resolution<span class="op">=</span><span class="fl">0.07</span>)</span>
+<span id="cb1-32"><a href="#cb1-32"></a></span>
+<span id="cb1-33"><a href="#cb1-33"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">8</span>))</span>
+<span id="cb1-34"><a href="#cb1-34"></a>plt.title(<span class="st">"Sample Data"</span>)</span>
+<span id="cb1-35"><a href="#cb1-35"></a>plt.scatter(x_sample, y_sample, c<span class="op">=</span>target_sample)</span>
+<span id="cb1-36"><a href="#cb1-36"></a>plt.xlim(left<span class="op">=</span><span class="bu">min</span>(x_sample[<span class="dv">0</span>]), right<span class="op">=</span><span class="bu">max</span>(x_sample[<span class="dv">0</span>]))</span>
+<span id="cb1-37"><a href="#cb1-37"></a>plt.ylim(bottom<span class="op">=</span><span class="bu">min</span>(x_sample[<span class="dv">0</span>]), top<span class="op">=</span><span class="bu">max</span>(x_sample[<span class="dv">0</span>]))</span>
+<span id="cb1-38"><a href="#cb1-38"></a>plt.xlabel(<span class="vs">r"$x_</span><span class="sc">{0}</span><span class="vs">$"</span>)</span>
+<span id="cb1-39"><a href="#cb1-39"></a>plt.ylabel(<span class="vs">r"$x_</span><span class="sc">{1}</span><span class="vs">$"</span>)</span>
+<span id="cb1-40"><a href="#cb1-40"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <p><img src="Implementing-Statistics_files/figure-html/cell-2-output-1.png" class="img-fluid"></p>
@@ -283,26 +297,26 @@ f(\bar{X}) = \begin{cases} 1,  &amp; x_{0} - x_{1} + \epsilon \geq -0.5 \\ 0, &a
 <div class="cell" data-execution_count="2">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LogisticRegression</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LogisticRegression</span>
+<span id="cb2-2"><a href="#cb2-2"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>One last time, let’s take a look at our data, but in a different way this time. Lets look at it in 3D, so we can see the literal sigmoidal nature of our model:</p>
 <div class="cell" data-execution_count="3">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> plt.figure(figsize<span class="op">=</span>(<span class="dv">14</span>, <span class="dv">7</span>))</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> plt.axes(projection<span class="op">=</span><span class="st">"3d"</span>)</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>ax.plot_surface(</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    x_sample, y_sample, target_sample, cmap<span class="op">=</span><span class="st">"coolwarm"</span>, rcount<span class="op">=</span><span class="dv">200</span>, ccount<span class="op">=</span><span class="dv">200</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="vs">r"$x_1$"</span>)</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="vs">r"$x_2$"</span>)</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>ax.zaxis.set_rotate_label(<span class="va">False</span>)</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>ax.set_zlabel(<span class="vs">r"$f(x_</span><span class="sc">{0}</span><span class="vs">,x_</span><span class="sc">{1}</span><span class="vs">)$"</span>, rotation<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>ax.view_init(<span class="dv">15</span>, <span class="dv">70</span>)</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Training Data"</span>)</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1"></a>fig <span class="op">=</span> plt.figure(figsize<span class="op">=</span>(<span class="dv">14</span>, <span class="dv">7</span>))</span>
+<span id="cb3-2"><a href="#cb3-2"></a>ax <span class="op">=</span> plt.axes(projection<span class="op">=</span><span class="st">"3d"</span>)</span>
+<span id="cb3-3"><a href="#cb3-3"></a>ax.plot_surface(</span>
+<span id="cb3-4"><a href="#cb3-4"></a>    x_sample, y_sample, target_sample, cmap<span class="op">=</span><span class="st">"coolwarm"</span>, rcount<span class="op">=</span><span class="dv">200</span>, ccount<span class="op">=</span><span class="dv">200</span></span>
+<span id="cb3-5"><a href="#cb3-5"></a>)</span>
+<span id="cb3-6"><a href="#cb3-6"></a>ax.set_xlabel(<span class="vs">r"$x_1$"</span>)</span>
+<span id="cb3-7"><a href="#cb3-7"></a>ax.set_ylabel(<span class="vs">r"$x_2$"</span>)</span>
+<span id="cb3-8"><a href="#cb3-8"></a>ax.zaxis.set_rotate_label(<span class="va">False</span>)</span>
+<span id="cb3-9"><a href="#cb3-9"></a>ax.set_zlabel(<span class="vs">r"$f(x_</span><span class="sc">{0}</span><span class="vs">,x_</span><span class="sc">{1}</span><span class="vs">)$"</span>, rotation<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb3-10"><a href="#cb3-10"></a>ax.view_init(<span class="dv">15</span>, <span class="dv">70</span>)</span>
+<span id="cb3-11"><a href="#cb3-11"></a>plt.title(<span class="st">"Training Data"</span>)</span>
+<span id="cb3-12"><a href="#cb3-12"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <p><img src="Implementing-Statistics_files/figure-html/cell-4-output-1.png" class="img-fluid"></p>
@@ -311,11 +325,11 @@ f(\bar{X}) = \begin{cases} 1,  &amp; x_{0} - x_{1} + \epsilon \geq -0.5 \\ 0, &a
 <p>Note the little section in the middle where we’ve added uncertainty. Everything else is relatively concrete in the output (we’re keeping it simple).</p>
 <p>Next step that we want to put our data in a nice dataframe and use <code>LogisticRegression</code> from <code>sklearn.linear_model</code>. This has some default that we’re going to use. Specifically, the “penalty” assigned to our training is the L2 norm. I’m going to make a post about the different types of penalty, but let’s keep it moving for now.</p>
 <div class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.DataFrame(</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"x1"</span>: x_sample.ravel(), <span class="st">"x2"</span>: y_sample.ravel(), <span class="st">"target"</span>: target_sample.ravel()}</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1"></a>df <span class="op">=</span> pd.DataFrame(</span>
+<span id="cb4-2"><a href="#cb4-2"></a>    {<span class="st">"x1"</span>: x_sample.ravel(), <span class="st">"x2"</span>: y_sample.ravel(), <span class="st">"target"</span>: target_sample.ravel()}</span>
+<span id="cb4-3"><a href="#cb4-3"></a>)</span>
+<span id="cb4-4"><a href="#cb4-4"></a></span>
+<span id="cb4-5"><a href="#cb4-5"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 
 <div>
@@ -367,8 +381,8 @@ f(\bar{X}) = \begin{cases} 1,  &amp; x_{0} - x_{1} + \epsilon \geq -0.5 \\ 0, &a
 </div>
 <p>There’s our little table, and here’s how we can fit the logistic regression with the defaults:</p>
 <div class="cell" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> LogisticRegression(random_state<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>model.fit(df[[<span class="st">"x1"</span>, <span class="st">"x2"</span>]], df.target)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1"></a>model <span class="op">=</span> LogisticRegression(random_state<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb5-2"><a href="#cb5-2"></a>model.fit(df[[<span class="st">"x1"</span>, <span class="st">"x2"</span>]], df.target)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
 <pre><code>LogisticRegression(random_state=0)</code></pre>
 </div>
@@ -377,17 +391,17 @@ f(\bar{X}) = \begin{cases} 1,  &amp; x_{0} - x_{1} + \epsilon \geq -0.5 \\ 0, &a
 <div class="cell" data-execution_count="7">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"predictions"</span>] <span class="op">=</span> model.predict(df[[<span class="st">"x1"</span>, <span class="st">"x2"</span>]])</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> plt.figure(figsize<span class="op">=</span>(<span class="dv">14</span>, <span class="dv">7</span>))</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> plt.axes(projection<span class="op">=</span><span class="st">"3d"</span>)</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>ax.plot_surface(</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    x_sample, y_sample, df[[<span class="st">"predictions"</span>]].to_numpy().reshape(<span class="dv">72</span>, <span class="dv">72</span>), cmap<span class="op">=</span><span class="st">"coolwarm"</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">"x1"</span>)</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">"x2"</span>)</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>ax.set_zlabel(<span class="st">"pred"</span>)</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>ax.view_init(<span class="dv">15</span>, <span class="dv">70</span>)</span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1"></a>df[<span class="st">"predictions"</span>] <span class="op">=</span> model.predict(df[[<span class="st">"x1"</span>, <span class="st">"x2"</span>]])</span>
+<span id="cb7-2"><a href="#cb7-2"></a>fig <span class="op">=</span> plt.figure(figsize<span class="op">=</span>(<span class="dv">14</span>, <span class="dv">7</span>))</span>
+<span id="cb7-3"><a href="#cb7-3"></a>ax <span class="op">=</span> plt.axes(projection<span class="op">=</span><span class="st">"3d"</span>)</span>
+<span id="cb7-4"><a href="#cb7-4"></a>ax.plot_surface(</span>
+<span id="cb7-5"><a href="#cb7-5"></a>    x_sample, y_sample, df[[<span class="st">"predictions"</span>]].to_numpy().reshape(<span class="dv">72</span>, <span class="dv">72</span>), cmap<span class="op">=</span><span class="st">"coolwarm"</span></span>
+<span id="cb7-6"><a href="#cb7-6"></a>)</span>
+<span id="cb7-7"><a href="#cb7-7"></a>ax.set_xlabel(<span class="st">"x1"</span>)</span>
+<span id="cb7-8"><a href="#cb7-8"></a>ax.set_ylabel(<span class="st">"x2"</span>)</span>
+<span id="cb7-9"><a href="#cb7-9"></a>ax.set_zlabel(<span class="st">"pred"</span>)</span>
+<span id="cb7-10"><a href="#cb7-10"></a>ax.view_init(<span class="dv">15</span>, <span class="dv">70</span>)</span>
+<span id="cb7-11"><a href="#cb7-11"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <p><img src="Implementing-Statistics_files/figure-html/cell-7-output-1.png" class="img-fluid"></p>

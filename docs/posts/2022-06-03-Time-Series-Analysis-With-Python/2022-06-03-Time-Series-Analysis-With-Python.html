@@ -8,6 +8,7 @@
 
 <meta name="author" content="Darpan Ganatra">
 <meta name="dcterms.date" content="2022-06-03">
+<meta name="description" content="It’s been a while since I’ve brushed up on my time series forecasting techniques. Time to get on it (this is a work in progress).">
 
 <title>Math and rambling - Time Series Analysis with Python</title>
 <style>
@@ -129,7 +130,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <link rel="stylesheet" href="../../styles.css">
 </head>
 
-<body class="nav-fixed fullcontent">
+<body class="nav-fixed">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -169,8 +170,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
       <h1 class="title">Time Series Analysis with Python</h1>
-            <p class="subtitle lead">It’s been a while since I’ve brushed up on my time series forecasting techniques. Time to get on it (this is a work in progress).</p>
-                                <div class="quarto-categories">
+                  <div>
+        <div class="description">
+          It’s been a while since I’ve brushed up on my time series forecasting techniques. Time to get on it (this is a work in progress).
+        </div>
+      </div>
+                          <div class="quarto-categories">
                 <div class="quarto-category">jupyter</div>
                 <div class="quarto-category">python</div>
                 <div class="quarto-category">timeseries</div>
@@ -201,7 +206,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#simple-methods" id="toc-simple-methods" class="nav-link active" data-scroll-target="#simple-methods">Simple Methods</a>
+  <ul class="collapse">
+  <li><a href="#average" id="toc-average" class="nav-link" data-scroll-target="#average">Average</a></li>
+  <li><a href="#naive" id="toc-naive" class="nav-link" data-scroll-target="#naive">Naive</a></li>
+  <li><a href="#seasonal-naive" id="toc-seasonal-naive" class="nav-link" data-scroll-target="#seasonal-naive">Seasonal Naive</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
 <!-- main -->
 <main class="content quarto-banner-title-block" id="quarto-document-content">
 
@@ -229,23 +247,23 @@ y_{1}, y_{2}, \dots , y_{T}
 <div class="cell" data-execution_count="1">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"https://raw.githubusercontent.com/selva86/datasets/master/elecequip.csv"</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>df.date <span class="op">=</span> pd.DatetimeIndex(df.date, freq<span class="op">=</span><span class="st">"MS"</span>)</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df.set_index(<span class="st">"date"</span>)</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">14</span>, <span class="dv">7</span>))</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Electrical Equipment Manufacturing (Euro Area)"</span>)</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>plt.plot(df.index, df.value)</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>plt.xlim(left<span class="op">=</span><span class="bu">min</span>(df.index), right<span class="op">=</span><span class="bu">max</span>(df.index))</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Date"</span>)</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Orders"</span>)</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-4"><a href="#cb1-4"></a></span>
+<span id="cb1-5"><a href="#cb1-5"></a>df <span class="op">=</span> pd.read_csv(</span>
+<span id="cb1-6"><a href="#cb1-6"></a>    <span class="st">"https://raw.githubusercontent.com/selva86/datasets/master/elecequip.csv"</span></span>
+<span id="cb1-7"><a href="#cb1-7"></a>)</span>
+<span id="cb1-8"><a href="#cb1-8"></a>df.date <span class="op">=</span> pd.DatetimeIndex(df.date, freq<span class="op">=</span><span class="st">"MS"</span>)</span>
+<span id="cb1-9"><a href="#cb1-9"></a>df <span class="op">=</span> df.set_index(<span class="st">"date"</span>)</span>
+<span id="cb1-10"><a href="#cb1-10"></a></span>
+<span id="cb1-11"><a href="#cb1-11"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">14</span>, <span class="dv">7</span>))</span>
+<span id="cb1-12"><a href="#cb1-12"></a>plt.title(<span class="st">"Electrical Equipment Manufacturing (Euro Area)"</span>)</span>
+<span id="cb1-13"><a href="#cb1-13"></a>plt.plot(df.index, df.value)</span>
+<span id="cb1-14"><a href="#cb1-14"></a>plt.xlim(left<span class="op">=</span><span class="bu">min</span>(df.index), right<span class="op">=</span><span class="bu">max</span>(df.index))</span>
+<span id="cb1-15"><a href="#cb1-15"></a>plt.xlabel(<span class="st">"Date"</span>)</span>
+<span id="cb1-16"><a href="#cb1-16"></a>plt.ylabel(<span class="st">"Orders"</span>)</span>
+<span id="cb1-17"><a href="#cb1-17"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <p><img src="2022-06-03-Time-Series-Analysis-With-Python_files/figure-html/cell-2-output-1.png" class="img-fluid"></p>
@@ -253,67 +271,67 @@ y_{1}, y_{2}, \dots , y_{T}
 </div>
 <p>Now I’ll be honest, I created my own <strong>very simple</strong> version of this for Pandas dataframes. This is not something I’d suggest using for anything other than learning:</p>
 <div class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> naive_average(y, h<span class="op">=</span><span class="dv">1</span>):</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Args: </span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">        y: Pandas object with DatetimeIndex</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">        h: Integer forecast horizon</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">assert</span> <span class="bu">isinstance</span>(y.index, pd.core.indexes.datetimes.DatetimeIndex)</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span>:</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">TypeError</span>(<span class="st">"y must be of type DatetimeIndex"</span>)</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">assert</span> <span class="bu">isinstance</span>(h, <span class="bu">int</span>)</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span>:</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">TypeError</span>(<span class="st">"h must be of type int"</span>)</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    ts <span class="op">=</span> y.copy(deep<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> ts.index.freq <span class="kw">is</span> <span class="va">None</span>:</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>        inf_freq <span class="op">=</span> pd.infer_freq(ts.index)</span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(</span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>            <span class="ss">f"NO FREQUENCY ASSOCIATED WITH INDEX, INFERRING FREQUENCY TO BE: </span><span class="sc">{</span>inf_freq<span class="sc">}</span><span class="ss">"</span></span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>        )</span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>        ts.index <span class="op">=</span> pd.DatetimeIndex(ts.index, freq<span class="op">=</span>inf_freq)</span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Create the extended index</span></span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    forecast_index <span class="op">=</span> pd.date_range(</span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>        ts.index[<span class="op">-</span><span class="dv">1</span>], periods<span class="op">=</span>h <span class="op">+</span> <span class="dv">1</span>, freq<span class="op">=</span>ts.index.freq, inclusive<span class="op">=</span><span class="st">"right"</span></span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Get the average</span></span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>    forecast_name <span class="op">=</span> ts.columns[<span class="dv">0</span>]</span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>    forecast_value <span class="op">=</span> np.array([ts[<span class="ss">f"</span><span class="sc">{</span>forecast_name<span class="sc">}</span><span class="ss">"</span>].mean()])</span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>    forecast_array <span class="op">=</span> np.repeat(a<span class="op">=</span>forecast_value, repeats<span class="op">=</span>h)</span>
-<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Create forecast dataframe</span></span>
-<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>    forecast_df <span class="op">=</span> pd.DataFrame(</span>
-<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>        forecast_array, index<span class="op">=</span>forecast_index, columns<span class="op">=</span>[forecast_name]</span>
-<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> pd.concat([ts, forecast_df], axis<span class="op">=</span><span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1"></a><span class="kw">def</span> naive_average(y, h<span class="op">=</span><span class="dv">1</span>):</span>
+<span id="cb2-2"><a href="#cb2-2"></a>    <span class="co">"""</span></span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="co">    Args: </span></span>
+<span id="cb2-4"><a href="#cb2-4"></a><span class="co">        y: Pandas object with DatetimeIndex</span></span>
+<span id="cb2-5"><a href="#cb2-5"></a><span class="co">        h: Integer forecast horizon</span></span>
+<span id="cb2-6"><a href="#cb2-6"></a><span class="co">    """</span></span>
+<span id="cb2-7"><a href="#cb2-7"></a>    <span class="cf">try</span>:</span>
+<span id="cb2-8"><a href="#cb2-8"></a>        <span class="cf">assert</span> <span class="bu">isinstance</span>(y.index, pd.core.indexes.datetimes.DatetimeIndex)</span>
+<span id="cb2-9"><a href="#cb2-9"></a>    <span class="cf">except</span>:</span>
+<span id="cb2-10"><a href="#cb2-10"></a>        <span class="cf">raise</span> <span class="pp">TypeError</span>(<span class="st">"y must be of type DatetimeIndex"</span>)</span>
+<span id="cb2-11"><a href="#cb2-11"></a>    <span class="cf">try</span>:</span>
+<span id="cb2-12"><a href="#cb2-12"></a>        <span class="cf">assert</span> <span class="bu">isinstance</span>(h, <span class="bu">int</span>)</span>
+<span id="cb2-13"><a href="#cb2-13"></a>    <span class="cf">except</span>:</span>
+<span id="cb2-14"><a href="#cb2-14"></a>        <span class="cf">raise</span> <span class="pp">TypeError</span>(<span class="st">"h must be of type int"</span>)</span>
+<span id="cb2-15"><a href="#cb2-15"></a></span>
+<span id="cb2-16"><a href="#cb2-16"></a>    ts <span class="op">=</span> y.copy(deep<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-17"><a href="#cb2-17"></a></span>
+<span id="cb2-18"><a href="#cb2-18"></a>    <span class="cf">if</span> ts.index.freq <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb2-19"><a href="#cb2-19"></a>        inf_freq <span class="op">=</span> pd.infer_freq(ts.index)</span>
+<span id="cb2-20"><a href="#cb2-20"></a>        <span class="bu">print</span>(</span>
+<span id="cb2-21"><a href="#cb2-21"></a>            <span class="ss">f"NO FREQUENCY ASSOCIATED WITH INDEX, INFERRING FREQUENCY TO BE: </span><span class="sc">{</span>inf_freq<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb2-22"><a href="#cb2-22"></a>        )</span>
+<span id="cb2-23"><a href="#cb2-23"></a>        ts.index <span class="op">=</span> pd.DatetimeIndex(ts.index, freq<span class="op">=</span>inf_freq)</span>
+<span id="cb2-24"><a href="#cb2-24"></a></span>
+<span id="cb2-25"><a href="#cb2-25"></a>    <span class="co"># Create the extended index</span></span>
+<span id="cb2-26"><a href="#cb2-26"></a>    forecast_index <span class="op">=</span> pd.date_range(</span>
+<span id="cb2-27"><a href="#cb2-27"></a>        ts.index[<span class="op">-</span><span class="dv">1</span>], periods<span class="op">=</span>h <span class="op">+</span> <span class="dv">1</span>, freq<span class="op">=</span>ts.index.freq, inclusive<span class="op">=</span><span class="st">"right"</span></span>
+<span id="cb2-28"><a href="#cb2-28"></a>    )</span>
+<span id="cb2-29"><a href="#cb2-29"></a>    <span class="co"># Get the average</span></span>
+<span id="cb2-30"><a href="#cb2-30"></a>    forecast_name <span class="op">=</span> ts.columns[<span class="dv">0</span>]</span>
+<span id="cb2-31"><a href="#cb2-31"></a>    forecast_value <span class="op">=</span> np.array([ts[<span class="ss">f"</span><span class="sc">{</span>forecast_name<span class="sc">}</span><span class="ss">"</span>].mean()])</span>
+<span id="cb2-32"><a href="#cb2-32"></a>    forecast_array <span class="op">=</span> np.repeat(a<span class="op">=</span>forecast_value, repeats<span class="op">=</span>h)</span>
+<span id="cb2-33"><a href="#cb2-33"></a></span>
+<span id="cb2-34"><a href="#cb2-34"></a>    <span class="co"># Create forecast dataframe</span></span>
+<span id="cb2-35"><a href="#cb2-35"></a>    forecast_df <span class="op">=</span> pd.DataFrame(</span>
+<span id="cb2-36"><a href="#cb2-36"></a>        forecast_array, index<span class="op">=</span>forecast_index, columns<span class="op">=</span>[forecast_name]</span>
+<span id="cb2-37"><a href="#cb2-37"></a>    )</span>
+<span id="cb2-38"><a href="#cb2-38"></a>    <span class="cf">return</span> pd.concat([ts, forecast_df], axis<span class="op">=</span><span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Here’s an example of our electricity prices forecasted out for 11 months with this method:</p>
 <div class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>forecast_df <span class="op">=</span> naive_average(df, h<span class="op">=</span><span class="dv">11</span>)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">14</span>, <span class="dv">7</span>))</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Average Forecast"</span>)</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>plt.plot(</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    forecast_df[:<span class="st">"2012-03-01"</span>].index,</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    forecast_df[:<span class="st">"2012-03-01"</span>].value,</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    label<span class="op">=</span><span class="st">"Original Series"</span>,</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>plt.plot(</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    forecast_df[<span class="st">"2012-04-01"</span>:].index,</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    forecast_df[<span class="st">"2012-04-01"</span>:].value,</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span><span class="st">"red"</span>,</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    label<span class="op">=</span><span class="st">"Average Forecast"</span>,</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>plt.xlim(left<span class="op">=</span><span class="bu">min</span>(forecast_df.index), right<span class="op">=</span><span class="bu">max</span>(forecast_df.index))</span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Date"</span>)</span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Orders"</span>)</span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1"></a>forecast_df <span class="op">=</span> naive_average(df, h<span class="op">=</span><span class="dv">11</span>)</span>
+<span id="cb3-2"><a href="#cb3-2"></a></span>
+<span id="cb3-3"><a href="#cb3-3"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">14</span>, <span class="dv">7</span>))</span>
+<span id="cb3-4"><a href="#cb3-4"></a>plt.title(<span class="st">"Average Forecast"</span>)</span>
+<span id="cb3-5"><a href="#cb3-5"></a>plt.plot(</span>
+<span id="cb3-6"><a href="#cb3-6"></a>    forecast_df[:<span class="st">"2012-03-01"</span>].index,</span>
+<span id="cb3-7"><a href="#cb3-7"></a>    forecast_df[:<span class="st">"2012-03-01"</span>].value,</span>
+<span id="cb3-8"><a href="#cb3-8"></a>    label<span class="op">=</span><span class="st">"Original Series"</span>,</span>
+<span id="cb3-9"><a href="#cb3-9"></a>)</span>
+<span id="cb3-10"><a href="#cb3-10"></a>plt.plot(</span>
+<span id="cb3-11"><a href="#cb3-11"></a>    forecast_df[<span class="st">"2012-04-01"</span>:].index,</span>
+<span id="cb3-12"><a href="#cb3-12"></a>    forecast_df[<span class="st">"2012-04-01"</span>:].value,</span>
+<span id="cb3-13"><a href="#cb3-13"></a>    color<span class="op">=</span><span class="st">"red"</span>,</span>
+<span id="cb3-14"><a href="#cb3-14"></a>    label<span class="op">=</span><span class="st">"Average Forecast"</span>,</span>
+<span id="cb3-15"><a href="#cb3-15"></a>)</span>
+<span id="cb3-16"><a href="#cb3-16"></a>plt.legend()</span>
+<span id="cb3-17"><a href="#cb3-17"></a>plt.xlim(left<span class="op">=</span><span class="bu">min</span>(forecast_df.index), right<span class="op">=</span><span class="bu">max</span>(forecast_df.index))</span>
+<span id="cb3-18"><a href="#cb3-18"></a>plt.xlabel(<span class="st">"Date"</span>)</span>
+<span id="cb3-19"><a href="#cb3-19"></a>plt.ylabel(<span class="st">"Orders"</span>)</span>
+<span id="cb3-20"><a href="#cb3-20"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>NO FREQUENCY ASSOCIATED WITH INDEX, INFERRING FREQUENCY TO BE: MS</code></pre>
 </div>
